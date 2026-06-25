@@ -35,9 +35,17 @@ def hello_world():
 @app.route('/login',methods=['POST','GET'])
 def login_page():
     if request.method=='POST':
-        session['useremail']=request.form['useremail'] # we basically store the useremail in our session so that we can use it further while calling /mytickets sort of API
-        print(session)
-        return redirect('/welcome') # here is the request is a POST request then the user will be redirected to the welcome page (since POST req means that user has submitted the login form)
+        # we need to validate if the user is present in our DB, its password, role everything needs to be validated 
+        useremail=request.form['useremail']
+        password=request.form['password']
+        user=User.query.filter_by(username=useremail).first()
+        if user and user.password==password:
+            #only if the user exists in the db and the passwords match only then are we allowing the user to enter the system
+            session['useremail']=useremail
+            session['role']=user.role
+            return redirect('/welcome')
+        else:
+            return "Invalid Credentials"
     return render_template('login.html')
 
 #creating landing page endpoint
