@@ -13,6 +13,7 @@ class User(db.Model):
 
 class Ticket(db.Model):
     TicketNumber=db.Column(db.Integer,primary_key=True,autoincrement=True)
+    UserEmail=db.Column(db.String(200))
     shortDesc=db.Column(db.String(200),nullable=False)
     longDesc=db.Column(db.String(200))
     IssueType=db.Column(db.String(10))
@@ -43,9 +44,10 @@ def raise_ticket():
         __bind_key__ = 'ticket_db'
         shortDesc=request.form['shortDesc']
         longDesc=request.form['longDesc']
+        UserEmail=session['useremail']
         print(shortDesc)
         print(longDesc)  
-        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc)
+        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail)
         print(ticket)
         db.session.add(ticket)
         db.session.commit()
