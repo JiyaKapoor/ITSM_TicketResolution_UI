@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ITSM Ticket Dashboard — Sign In</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-base:    #0b0f17;
+      --bg-panel:   #111827;
+      --bg-input:   #1a2235;
+      --border:     #1f2d45;
+      --accent:     #3b82f6;
+      --accent-dim: #1d4ed8;
+      --text-pri:   #e2e8f0;
+      --text-sec:   #64748b;
+      --text-mute:  #374151;
+      --green:      #10b981;
+      --red:        #ef4444;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      background-color: var(--bg-base);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-pri);
+      overflow: hidden;
+    }
+
+    /* Subtle grid backdrop */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Glow blob */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -160px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 720px;
+      height: 360px;
+      background: radial-gradient(ellipse, rgba(59,130,246,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 36px 36px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    /* Top status bar */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-bottom: 32px;
+      letter-spacing: 0.04em;
+    }
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-pri);
+      margin-bottom: 4px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-sec);
+      margin-bottom: 32px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-sec);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text-pri);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      padding: 10px 14px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .form-control:focus {
+      background: var(--bg-input);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.18);
+      color: var(--text-pri);
+      outline: none;
+    }
+    .form-control::placeholder { color: var(--text-mute); }
+
+    .input-group-text {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-right: none;
+      color: var(--text-sec);
+      padding: 10px 12px;
+    }
+    .input-group .form-control {
+      border-left: none;
+    }
+    .input-group:focus-within .input-group-text,
+    .input-group:focus-within .form-control {
+      border-color: var(--accent);
+    }
+
+    .forgot {
+      font-size: 12px;
+      color: var(--text-sec);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .forgot:hover { color: var(--accent); }
+
+    .btn-signin {
+      background: var(--accent);
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 11px;
+      width: 100%;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.01em;
+    }
+    .btn-signin:hover  { background: var(--accent-dim); }
+    .btn-signin:active { transform: scale(0.99); }
+
+    /* SSO divider */
+    .sso-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--text-sec);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .sso-divider::before,
+    .sso-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .btn-sso {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text-sec);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: border-color 0.15s, color 0.15s;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-sso:hover {
+      border-color: var(--accent);
+      color: var(--text-pri);
+    }
+    .btn-sso svg { flex-shrink: 0; }
+
+    .form-check-input {
+      background-color: var(--bg-input);
+      border-color: var(--border);
+    }
+    .form-check-input:checked {
+      background-color: var(--accent);
+      border-color: var(--accent);
+    }
+    .form-check-label {
+      font-size: 13px;
+      color: var(--text-sec);
+    }
+
+    /* Footer meta */
+    .meta-footer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .meta-footer span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-mute);
+      letter-spacing: 0.06em;
+    }
+    .severity-chips {
+      display: flex;
+      gap: 5px;
+    }
+    .chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.06em;
+    }
+    .chip-p1 { background: rgba(239,68,68,0.15);  color: #ef4444; }
+    .chip-p2 { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .chip-p3 { background: rgba(59,130,246,0.15); color: #3b82f6; }
+  </style>
+</head>
+<body>
+
+<div class="login-card">  
+
+  <!-- Brand + heading -->
+  <div class="brand">HCLTech · ITSM</div>
+  <h1>Ticket Dashboard</h1>
+  <p class="subtitle">Sign in to manage and resolve tickets</p>
+
+  <!-- Email -->
+  <div class="mb-3">
+    <label for="email">Employee ID / Email</label>
+    <div class="input-group">
+      <span class="input-group-text">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </span>
+      <input type="text" class="form-control" id="email" placeholder="emp.id@hcltech.com" autocomplete="username" />
+    </div>
+  </div>
+
+  <!-- Password -->
+  <div class="mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+      <label for="password">Password</label>
+      <a href="#" class="forgot">Forgot password?</a>
+    </div>
+    <div class="input-group">
+      <span class="input-group-text">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </span>
+      <input type="password" class="form-control" id="password" placeholder="••••••••••" autocomplete="current-password" />
+    </div>
+  </div>
+
+  <!-- Remember -->
+  <div class="form-check mb-4">
+    <input class="form-check-input" type="checkbox" id="remember" />
+    <label class="form-check-label" for="remember">Keep me signed in for 8 hours</label>
+  </div>
+
+  <!-- Submit -->
+  <button class="btn-signin">Sign In</button>
+
+  <!-- SSO -->
+  <div class="sso-divider">or continue with</div>
+  <button class="btn-sso">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" stroke="currentColor" stroke-width="1.6"/>
+    </svg>
+    Sign in with SSO / Active Directory
+  </button>
+
+  <!-- Footer meta -->
+  <div class="meta-footer">
+    <span>SECURE · TLS 1.3</span>
+    <div class="severity-chips">
+      <span class="chip chip-p1">P1</span>
+      <span class="chip chip-p2">P2</span>
+      <span class="chip chip-p3">P3</span>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
