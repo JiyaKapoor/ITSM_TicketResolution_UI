@@ -1,15 +1,19 @@
 from flask import Flask,render_template,request,session,redirect
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
-app.config['SQLALCHEMY_DATABASE_URI']="sqlite:///itsm_ticket_resolution.db"
-app.config['SQLALCHEMY_BINDS'] = {    
-    'ticket_db': 'sqlite:///ticket.db'
-}
+app.config['SQLALCHEMY_DATABASE_URI'] = \
+    'postgresql://postgres:jiya123@localhost:5432/itsm_db'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db=SQLAlchemy(app)
+
 class User(db.Model):
     username=db.Column(db.String(200),primary_key=True)
     password=db.Column(db.String(200),nullable=False)
+    role=db.Column(db.String(20),nullable=False) # a user maybe admin or User 
 
 class Ticket(db.Model):
     TicketNumber=db.Column(db.Integer,primary_key=True,autoincrement=True)
@@ -19,6 +23,9 @@ class Ticket(db.Model):
     IssueType=db.Column(db.String(10))
     Priority=db.Column(db.String(10))
     Status=db.Column(db.String(20))
+    AssignedTo=db.Column(db.String(50))
+    CreatedAt=db.Column(db.DateTime)
+    Resolution=db.Column(db.String(500))
 
 @app.route('/')
 def hello_world():
@@ -40,8 +47,7 @@ def welcome_page():
 
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
-    if(request.method=='POST'):
-        __bind_key__ = 'ticket_db'
+    if(request.method=='POST'):     
         shortDesc=request.form['shortDesc']
         longDesc=request.form['longDesc']
         issueType=request.form['issueType']
@@ -49,7 +55,7 @@ def raise_ticket():
         UserEmail=session['useremail'] # user email is taken from the current session only 
         print(shortDesc)
         print(longDesc)  
-        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN")
+        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN",CreatedAt=datetime.now())
         print(ticket)
         db.session.add(ticket)
         db.session.commit()
@@ -66,6 +72,8 @@ def fetch_my_tickets():
     return render_template("my_tickets.html",tickets=tickets)#we are sending the filtered tickets to the frontend via the render_template method 
 
 with app.app_context():
+    print(db.engine.url)
+    print(db.metadata.tables.keys())
     db.create_all()
 
 if __name__=="__main__":
