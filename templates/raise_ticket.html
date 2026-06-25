@@ -147,24 +147,30 @@ textarea{
             </div>
             <div class="section">
                 <label>Issue Type *</label>
-
-                <div class="grid">
-                    <div class="choice">Hardware</div>
-                    <div class="choice">Software</div>
-                    <div class="choice">Network</div>                    
-                    <div class="choice">Email</div>
-                    <div class="choice">Other</div>
+                <input type="hidden" name="issueType" id="issueType">
+                <div class="choice" onclick="selectIssue(this,'Hardware')">
+                    Hardware
+                </div>
+                <div class="choice" onclick="selectIssue(this,'Software')">
+                    Software
+                </div>
+                <div class="choice" onclick="selectIssue(this,'Network')">
+                    Network
                 </div>
             </div>
 
             <div class="section">
-                <label>Priority *</label>
-
-                <div class="priority">
-                    <div class="choice">P1 Critical</div>
-                    <div class="choice">P2 High</div>
-                    <div class="choice">P3 Normal</div>
+                <label>Priority</label>
+                <input type="hidden" name="priority" id="priority">
+                <div class="choice" onclick="selectIssue(this,'P1')">
+                    P1
                 </div>
+                <div class="choice" onclick="selectIssue(this,'P2')">
+                    P2
+                </div>
+                <div class="choice" onclick="selectIssue(this,'P3')">
+                    P3
+                </div>                
             </div>
 
             <button class="submit" type="submit">
@@ -178,6 +184,17 @@ textarea{
 </div>
 
 <script>
+
+function selectIssue(element, value){
+
+    document.getElementById('issueType').value = value;
+
+    document.querySelectorAll('.choice')
+            .forEach(c => c.classList.remove('selected'));
+
+    element.classList.add('selected');
+}
+
 document.querySelectorAll('.choice').forEach(card=>{
     card.addEventListener('click',()=>{
         const parent=card.parentElement;

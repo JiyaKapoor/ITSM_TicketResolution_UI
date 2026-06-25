@@ -18,7 +18,7 @@ class Ticket(db.Model):
     longDesc=db.Column(db.String(200))
     IssueType=db.Column(db.String(10))
     Priority=db.Column(db.String(10))
-
+    Status=db.Column(db.String(20))
 
 @app.route('/')
 def hello_world():
@@ -44,10 +44,12 @@ def raise_ticket():
         __bind_key__ = 'ticket_db'
         shortDesc=request.form['shortDesc']
         longDesc=request.form['longDesc']
+        issueType=request.form['issueType']
+        priority=request.form['priority']
         UserEmail=session['useremail']
         print(shortDesc)
         print(longDesc)  
-        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail)
+        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN")
         print(ticket)
         db.session.add(ticket)
         db.session.commit()

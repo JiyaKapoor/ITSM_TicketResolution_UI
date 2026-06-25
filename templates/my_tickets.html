@@ -136,10 +136,6 @@ body{
                     {{ ticket.shortDesc }}
                 </div>
 
-                <div class="ticket-id">
-                    #{{ ticket.id }}
-                </div>
-
             </div>
 
             <div class="ticket-desc">
@@ -147,11 +143,10 @@ body{
             </div>
 
             <div class="ticket-footer">
-
-                {% if ticket.status == 'OPEN' %}
+                {% if ticket.Status == 'OPEN' %}
                     <span class="badge-status open">OPEN</span>
 
-                {% elif ticket.status == 'IN_PROGRESS' %}
+                {% elif ticket.Status == 'IN_PROGRESS' %}
                     <span class="badge-status inprogress">
                         IN PROGRESS
                     </span>
@@ -160,11 +155,7 @@ body{
                     <span class="badge-status closed">
                         CLOSED
                     </span>
-                {% endif %}
-
-                <small class="text-secondary">
-                    {{ ticket.created_at }}
-                </small>
+                {% endif %}                
 
             </div>
 
