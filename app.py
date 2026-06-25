@@ -58,7 +58,10 @@ def raise_ticket():
 
 @app.route('/my_tickets')
 def fetch_my_tickets():
-    return render_template("my_tickets.html")
+    # we now need to query the database to fetch tickets with the required user email id 
+    email=session['useremail']
+    tickets=Ticket.query.filter_by(UserEmail=email).all()
+    return render_template("my_tickets.html",tickets=tickets)
 
 with app.app_context():
     db.create_all()
