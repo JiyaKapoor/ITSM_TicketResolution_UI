@@ -1,7 +1,7 @@
 from flask import Flask,render_template,request,session,redirect
 from flask_sqlalchemy import SQLAlchemy
 app=Flask(__name__)
-app.secret_key="jiya@123"
+app.secret_key="jiya@123" # used to cryptographically sign the user session key 
 app.config['SQLALCHEMY_DATABASE_URI']="sqlite:///itsm_ticket_resolution.db"
 app.config['SQLALCHEMY_BINDS'] = {    
     'ticket_db': 'sqlite:///ticket.db'
@@ -30,7 +30,7 @@ def login_page():
     if request.method=='POST':
         session['useremail']=request.form['useremail'] # we basically store the useremail in our session so that we can use it further while calling /mytickets sort of API
         print(session)
-        return redirect('/welcome')
+        return redirect('/welcome') # here is the request is a POST request then the user will be redirected to the welcome page (since POST req means that user has submitted the login form)
     return render_template('login.html')
 
 #creating landing page endpoint
@@ -45,8 +45,8 @@ def raise_ticket():
         shortDesc=request.form['shortDesc']
         longDesc=request.form['longDesc']
         issueType=request.form['issueType']
-        priority=request.form['priority']
-        UserEmail=session['useremail']
+        priority=request.form['priority'] # all these fields shortDesc, longDesc are coming populated from the frontend 
+        UserEmail=session['useremail'] # user email is taken from the current session only 
         print(shortDesc)
         print(longDesc)  
         ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN")
@@ -63,7 +63,7 @@ def fetch_my_tickets():
     # we now need to query the database to fetch tickets with the required user email id 
     email=session['useremail']
     tickets=Ticket.query.filter_by(UserEmail=email).all()
-    return render_template("my_tickets.html",tickets=tickets)
+    return render_template("my_tickets.html",tickets=tickets)#we are sending the filtered tickets to the frontend via the render_template method 
 
 with app.app_context():
     db.create_all()

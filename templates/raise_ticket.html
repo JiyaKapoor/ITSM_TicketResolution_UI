@@ -68,6 +68,50 @@ label{
     letter-spacing:.08em;
     color:var(--muted);
 }
+.choice-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.choice {
+    padding: 12px 18px;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.choice:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.choice.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.p1.selected {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.p2.selected {
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.p3.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+}
 
 input,textarea{
     width:100%;
@@ -146,32 +190,55 @@ textarea{
                 <input type="text" name="longDesc">            
             </div>
             <div class="section">
-                <label>Issue Type *</label>
-                <input type="hidden" name="issueType" id="issueType">
-                <div class="choice" onclick="selectIssue(this,'Hardware')">
-                    Hardware
-                </div>
-                <div class="choice" onclick="selectIssue(this,'Software')">
-                    Software
-                </div>
-                <div class="choice" onclick="selectIssue(this,'Network')">
-                    Network
-                </div>
-            </div>
+    <label>Issue Type *</label>
 
-            <div class="section">
-                <label>Priority</label>
-                <input type="hidden" name="priority" id="priority">
-                <div class="choice" onclick="selectIssue(this,'P1')">
-                    P1
-                </div>
-                <div class="choice" onclick="selectIssue(this,'P2')">
-                    P2
-                </div>
-                <div class="choice" onclick="selectIssue(this,'P3')">
-                    P3
-                </div>                
-            </div>
+    <input type="hidden" name="issueType" id="issueType">
+
+    <div class="choice-container">
+        <div class="choice" onclick="selectOption(this,'Hardware','issueType')">
+            💻 Hardware
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Software','issueType')">
+            ⚙️ Software
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Network','issueType')">
+            🌐 Network
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Email','issueType')">
+            📧 Email
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Other','issueType')">
+            📋 Other
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <label>Priority</label>
+
+    <input type="hidden" name="priority" id="priority">
+
+    <div class="choice-container">
+        <div class="choice priority p1"
+             onclick="selectOption(this,'P1','priority')">
+            🔴 P1
+        </div>
+
+        <div class="choice priority p2"
+             onclick="selectOption(this,'P2','priority')">
+            🟡 P2
+        </div>
+
+        <div class="choice priority p3"
+             onclick="selectOption(this,'P3','priority')">
+            🔵 P3
+        </div>
+    </div>
+</div>
 
             <button class="submit" type="submit">
                 Submit Ticket
