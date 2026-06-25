@@ -1,6 +1,7 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,session,redirect
 from flask_sqlalchemy import SQLAlchemy
 app=Flask(__name__)
+app.secret_key="jiya@123"
 app.config['SQLALCHEMY_DATABASE_URI']="sqlite:///itsm_ticket_resolution.db"
 app.config['SQLALCHEMY_BINDS'] = {    
     'ticket_db': 'sqlite:///ticket.db'
@@ -23,12 +24,12 @@ def hello_world():
     return 'Hello World!'
 
 
-@app.route('/login')
+@app.route('/login',methods=['POST','GET'])
 def login_page():
-    #now we need to add the user to our database (used SQLLite)
-    user=User(username="abc@gmail.com",password="priya@123")
-    db.session.add(user)
-    db.session.commit()
+    if request.method=='POST':
+        session['useremail']=request.form['useremail'] # we basically store the useremail in our session so that we can use it further while calling /mytickets sort of API
+        print(session)
+        return redirect('/welcome')
     return render_template('login.html')
 
 #creating landing page endpoint
@@ -52,6 +53,10 @@ def raise_ticket():
         for t in Ticket.query.all():
             print(t.shortDesc)
     return render_template('raise_ticket.html')
+
+@app.route('/my_tickets')
+def fetch_my_tickets():
+    return render_template("my_tickets.html")
 
 with app.app_context():
     db.create_all()
