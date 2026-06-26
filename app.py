@@ -87,6 +87,11 @@ def welcom_agent():
     # without all, it returns a pending query object which we cant loop through 
     return render_template('welcome_agent.html',TicketStats=ticketstats)
 
+@app.route("/agent/tickets")
+def fetch_all_tickets():
+    tickets=Ticket.query.all()
+    return render_template("fetch_all_tickets.html",Tickets=tickets)
+
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
     if(request.method=='POST'):     
