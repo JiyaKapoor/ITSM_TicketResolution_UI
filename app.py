@@ -27,6 +27,12 @@ class Ticket(db.Model):
     CreatedAt=db.Column(db.DateTime)
     Resolution=db.Column(db.String(500))
 
+class TicketStats:
+    tickets_today=db.Column(db.Integer)
+    auto_resolved=db.Column(db.Integer)
+    avg_resolution_time=db.Column(db.Integer)
+    sla_breaches=db.Column(db.Integer)
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
