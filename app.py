@@ -2,7 +2,7 @@ from flask import Flask,render_template,request,session,redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func,or_
 from datetime import datetime
-from datetime import date
+from datetime import date,timedelta
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
@@ -100,9 +100,13 @@ def raise_ticket():
         issueType=request.form['issueType']
         priority=request.form['priority'] # all these fields shortDesc, longDesc are coming populated from the frontend 
         UserEmail=session['useremail'] # user email is taken from the current session only 
-        print(shortDesc)
-        print(longDesc)  
-        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN",CreatedAt=datetime.now())
+        if(priority=="P1"):
+            sla_due=datetime.now() + timedelta(hours=4)
+        elif(priority=="P2"):
+            sla_due=datetime.now() +  timedelta(hours=8)
+        else:
+            sla_due=datetime.now() + timedelta(hours=12)
+        ticket=Ticket(shortDesc=shortDesc,longDesc=longDesc,UserEmail=UserEmail,IssueType=issueType,Priority=priority,Status="OPEN",CreatedAt=datetime.now(),Sla_due=sla_due)
         print(ticket)
         db.session.add(ticket)
         db.session.commit()
