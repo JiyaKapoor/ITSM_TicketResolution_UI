@@ -1,5 +1,5 @@
 from flask import Flask,render_template,request,session,redirect
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy,func
 from datetime import datetime
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
@@ -25,7 +25,11 @@ class Ticket(db.Model):
     Status=db.Column(db.String(20))
     AssignedTo=db.Column(db.String(50))
     CreatedAt=db.Column(db.DateTime)
+    ResolvedAt=db.Column(db.DateTime)
+    Sla_due=db.Column(db.DateTime)
     Resolution=db.Column(db.String(500))
+    ResolutionType=db.Column(db.String(20))
+    
 
 class TicketStats:
     tickets_today=db.Column(db.Integer)
@@ -61,6 +65,14 @@ def welcome_page():
 
 @app.route('/welcome_agent')
 def welcom_agent():
+    #on the welcome page, we need to show stats to the agent (daily ticket stat)
+    # for that we query the data from our tickets table and wrap it in the ticketStatus class which is then sent to the welcome_agent.html and rendered via jinja2template
+    tickets_today=Ticket.query.filter(Ticket.CreatedAt>=datetime.date.today()).all()
+    num_auto_resolved=Ticket.query.filter(Ticket.ResolutionType=="AUTO").count()
+    avg_resolution_time=db.session.execute(db.select(func.avg(Ticket.ResolvedAt - Ticket.CreatedAt)).where(Ticket.ResolvedAt >= datetime.today())).scalar()
+    sla_breaches=Ticket.query.filter(Ticket.ResolvedAt>Ticket.Sla_due | Ticket.Sla_due<datetime.now()).count()
+    # the significance of using .all() here is that The .all() method executes the database query and returns the results as a standard Python list containing your model objects (here Ticket object)
+    # without all, it returns a pending query object which we cant loop through 
     return render_template('welcome_agent.html')
 
 @app.route('/raise_ticket',methods=['GET','POST'])
