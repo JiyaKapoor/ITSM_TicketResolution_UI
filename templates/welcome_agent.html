@@ -896,11 +896,7 @@
       <div class="brand-name">ITSM AI Agent</div>
       <div class="brand-sub">HCLTech</div>
     </div>
-  </div>
-  <div class="header-right">
-    <div class="status-pill"><div class="status-dot"></div>All systems operational</div>
-    <div class="avatar">JK</div>
-  </div>
+  </div>  
 </header>
 
 <!-- TAB NAV -->
@@ -930,23 +926,19 @@
       <div class="stat-row">
         <div class="stat-card blue">
           <div class="stat-label">Total Tickets Today</div>
-          <div class="stat-value">284</div>
-          <div class="stat-sub"><span class="up">↑ 18</span> from yesterday</div>
+          <div class="stat-value">{{TicketStats.tickets_today}}</div>         
         </div>
         <div class="stat-card green">
           <div class="stat-label">Auto-Resolved</div>
-          <div class="stat-value">211</div>
-          <div class="stat-sub"><span class="up">74.3%</span> resolution rate</div>
+          <div class="stat-value">{{TicketStats.auto_resolved}}</div>         
         </div>
         <div class="stat-card amber">
           <div class="stat-label">Avg Resolution Time</div>
-          <div class="stat-value">4.2s</div>
-          <div class="stat-sub"><span class="up">↓ 0.8s</span> vs last week</div>
+          <div class="stat-value">{{TicketStats.avg_resolution_time}}</div>
         </div>
         <div class="stat-card red">
           <div class="stat-label">SLA Breaches</div>
-          <div class="stat-value">3</div>
-          <div class="stat-sub"><span class="dn">↑ 2</span> needs attention</div>
+          <div class="stat-value">{{TicketStats.sla_breaches}}</div>          
         </div>
       </div>
 

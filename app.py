@@ -1,6 +1,8 @@
 from flask import Flask,render_template,request,session,redirect
-from flask_sqlalchemy import SQLAlchemy,func
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func,or_
 from datetime import datetime
+from datetime import date
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
@@ -31,7 +33,8 @@ class Ticket(db.Model):
     ResolutionType=db.Column(db.String(20))
     
 
-class TicketStats:
+class TicketStats(db.Model):    
+    id = db.Column(db.Integer, primary_key=True,auto_increment=True)
     tickets_today=db.Column(db.Integer)
     auto_resolved=db.Column(db.Integer)
     avg_resolution_time=db.Column(db.Integer)
@@ -67,13 +70,22 @@ def welcome_page():
 def welcom_agent():
     #on the welcome page, we need to show stats to the agent (daily ticket stat)
     # for that we query the data from our tickets table and wrap it in the ticketStatus class which is then sent to the welcome_agent.html and rendered via jinja2template
-    tickets_today=Ticket.query.filter(Ticket.CreatedAt>=datetime.date.today()).all()
+    tickets_today=Ticket.query.filter(Ticket.CreatedAt>=date.today()).count()
+    print(tickets_today)
     num_auto_resolved=Ticket.query.filter(Ticket.ResolutionType=="AUTO").count()
-    avg_resolution_time=db.session.execute(db.select(func.avg(Ticket.ResolvedAt - Ticket.CreatedAt)).where(Ticket.ResolvedAt >= datetime.today())).scalar()
-    sla_breaches=Ticket.query.filter(Ticket.ResolvedAt>Ticket.Sla_due | Ticket.Sla_due<datetime.now()).count()
+    avg_resolution_time = db.session.execute(
+        db.select(
+            func.avg(
+                func.extract('epoch', Ticket.ResolvedAt - Ticket.CreatedAt) / 60
+            )
+        ).where(Ticket.ResolvedAt > date.today())
+    ).scalar()
+    avg_resolution_time = int(avg_resolution_time or 0)
+    sla_breaches=Ticket.query.filter((Ticket.ResolvedAt>Ticket.Sla_due) | (Ticket.Sla_due<datetime.now())).count()
+    ticketstats=TicketStats(tickets_today=tickets_today,auto_resolved=num_auto_resolved,avg_resolution_time=avg_resolution_time,sla_breaches=sla_breaches)
     # the significance of using .all() here is that The .all() method executes the database query and returns the results as a standard Python list containing your model objects (here Ticket object)
     # without all, it returns a pending query object which we cant loop through 
-    return render_template('welcome_agent.html')
+    return render_template('welcome_agent.html',TicketStats=ticketstats)
 
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
