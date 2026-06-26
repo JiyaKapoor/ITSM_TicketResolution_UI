@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ITSM AI Agent — HCLTech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --base:    #0D1117;
+    --surface: #161B22;
+    --card:    #21262D;
+    --border:  #30363D;
+    --blue:    #58A6FF;
+    --green:   #3FB950;
+    --red:     #F78166;
+    --amber:   #E3B341;
+    --purple:  #BC8CFF;
+    --text:    #E6EDF3;
+    --muted:   #8B949E;
+    --dim:     #484F58;
+  }
+
+  body {
+    background: var(--base);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── KAFKA TICKER ─── */
+  .ticker-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 0;
+    overflow: hidden;
+    position: relative;
+  }
+  .ticker-bar::before, .ticker-bar::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 60px;
+    z-index: 2;
+  }
+  .ticker-bar::before { left: 0; background: linear-gradient(90deg, var(--surface), transparent); }
+  .ticker-bar::after  { right: 0; background: linear-gradient(-90deg, var(--surface), transparent); }
+  .ticker-label {
+    position: absolute;
+    left: 16px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: .08em;
+    z-index: 3;
+    background: var(--surface);
+    padding-right: 8px;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 40px;
+    animation: ticker 28s linear infinite;
+    white-space: nowrap;
+    padding-left: 160px;
+  }
+  .ticker-track:hover { animation-play-state: paused; }
+  @keyframes ticker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .tick-event {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tick-event .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tick-event .dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .tick-event .dot.blue  { background: var(--blue);  box-shadow: 0 0 6px var(--blue); }
+  .tick-event .dot.amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  .tick-event .dot.red   { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+
+  /* ─── HEADER ─── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--blue) 0%, var(--purple) 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .brand-name {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 1px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(63, 185, 80, .12);
+    border: 1px solid rgba(63, 185, 80, .3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+  }
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #58A6FF, #BC8CFF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* ─── NAV TABS ─── */
+  .tab-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    padding: 14px 18px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: color .15s, border-color .15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab-badge {
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 1px 6px;
+    line-height: 1.5;
+  }
+  .tab-badge.green { background: var(--green); color: var(--base); }
+
+  /* ─── LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: calc(100vh - 105px);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0;
+  }
+  .sidebar-section {
+    margin-bottom: 8px;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    color: var(--dim);
+    text-transform: uppercase;
+    padding: 6px 16px 4px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    color: var(--muted);
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    font-size: 13px;
+    transition: all .15s;
+  }
+  .sidebar-item:hover { color: var(--text); background: rgba(255,255,255,.03); }
+  .sidebar-item.active { color: var(--blue); border-left-color: var(--blue); background: rgba(88, 166, 255, .06); }
+  .sidebar-item .ico { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-count {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+  }
+  .sidebar-count.red { color: var(--red); }
+
+  /* ─── MAIN CONTENT ─── */
+  main {
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  /* ─── PANELS ─── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ─── STAT CARDS ─── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .stat-card.blue::before  { background: var(--blue); }
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.amber::before { background: var(--amber); }
+  .stat-card.red::before   { background: var(--red); }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+  .stat-card.blue  .stat-value { color: var(--blue); }
+  .stat-card.green .stat-value { color: var(--green); }
+  .stat-card.amber .stat-value { color: var(--amber); }
+  .stat-card.red   .stat-value { color: var(--red); }
+  .stat-sub {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-sub .up { color: var(--green); }
+  .stat-sub .dn { color: var(--red); }
+
+  /* ─── SECTION TITLE ─── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: .01em;
+  }
+  .section-action {
+    font-size: 12px;
+    color: var(--blue);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: inherit;
+  }
+
+  /* ─── TICKET TABLE ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,.02);
+  }
+  td {
+    padding: 11px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid rgba(48,54,61,.6);
+    vertical-align: middle;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge.critical { background: rgba(247,129,102,.15); color: var(--red); border: 1px solid rgba(247,129,102,.3); }
+  .badge.high     { background: rgba(227,179,65,.15);  color: var(--amber); border: 1px solid rgba(227,179,65,.3); }
+  .badge.medium   { background: rgba(88,166,255,.15);  color: var(--blue); border: 1px solid rgba(88,166,255,.3); }
+  .badge.low      { background: rgba(63,185,80,.15);   color: var(--green); border: 1px solid rgba(63,185,80,.3); }
+  .badge.resolved { background: rgba(63,185,80,.1);    color: var(--green); }
+  .badge.open     { background: rgba(88,166,255,.1);   color: var(--blue); }
+  .badge.pending  { background: rgba(227,179,65,.1);   color: var(--amber); }
+  .badge.processing { background: rgba(188,140,255,.1); color: var(--purple); }
+  .confidence-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bar-bg {
+    width: 70px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--green);
+    transition: width .5s;
+  }
+  .bar-fill.amber { background: var(--amber); }
+  .bar-fill.red   { background: var(--red); }
+
+  /* ─── DUAL GRID ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* ─── ACTIVITY LOG ─── */
+  .log-list {
+    padding: 8px 0;
+  }
+  .log-entry {
+    display: flex;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid rgba(48,54,61,.4);
+    align-items: flex-start;
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .log-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--dim);
+    margin-top: 2px;
+    white-space: nowrap;
+    width: 56px;
+    flex-shrink: 0;
+  }
+  .log-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .log-text strong { color: var(--text); }
+
+  /* ─── RAG PANEL ─── */
+  .rag-query-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .rag-input-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .rag-input {
+    flex: 1;
+    background: var(--base);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .rag-input:focus { border-color: var(--blue); }
+  .btn {
+    background: var(--blue);
+    color: var(--base);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .15s;
+    white-space: nowrap;
+  }
+  .btn:hover { opacity: .85; }
+  .btn.secondary {
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .rag-result {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .rag-result-header {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .rag-steps {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .rag-step {
+    display: flex;
+    gap: 12px;
+  }
+  .rag-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(88,166,255,.15);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .rag-step-content { flex: 1; }
+  .rag-step-title { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+  .rag-step-body { font-size: 11px; color: var(--muted); line-height: 1.6; font-family: 'JetBrains Mono', monospace; }
+  .chunk-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .chunk {
+    background: var(--base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    border-left: 3px solid var(--purple);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .chunk-source { font-size: 10px; color: var(--dim); margin-top: 4px; }
+
+  /* ─── KAFKA PANEL ─── */
+  .kafka-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .kafka-topic {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .topic-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--blue);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .topic-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .topic-meta-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+  }
+  .topic-meta-row span:first-child { color: var(--muted); }
+  .topic-meta-row span:last-child { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .consumer-list { display: flex; flex-direction: column; gap: 6px; }
+  .consumer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--base);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font-size: 11px;
+  }
+  .consumer .dot { width: 6px; height: 6px; border-radius: 50%; }
+  .consumer .dot.on  { background: var(--green); }
+  .consumer .dot.off { background: var(--dim); }
+
+  .event-stream {
+    background: var(--base);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    overflow: hidden;
+  }
+  .stream-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .stream-body {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .stream-line { color: var(--muted); line-height: 1.7; }
+  .stream-line .t { color: var(--dim); }
+  .stream-line .k { color: var(--purple); }
+  .stream-line .v { color: var(--green); }
+  .stream-line .e { color: var(--amber); }
+
+  /* ─── ANALYTICS ─── */
+  .chart-wrapper {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .chart-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 16px;
+  }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 120px;
+  }
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .bar-rect {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    position: relative;
+    overflow: hidden;
+    transition: opacity .15s;
+  }
+  .bar-rect:hover { opacity: .8; }
+  .bar-rect::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(255,255,255,.2);
+    border-radius: 2px;
+  }
+  .bar-x { font-size: 10px; color: var(--dim); font-family: 'JetBrains Mono', monospace; }
+
+  .donut-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .donut-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { color: var(--muted); flex: 1; }
+  .legend-val { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text); }
+
+  /* ─── SETTINGS ─── */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .settings-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .settings-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .field-group { display: flex; flex-direction: column; gap: 12px; }
+  .field-label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  .field-input:focus { border-color: var(--blue); }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(48,54,61,.5);
+  }
+  .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .toggle-info { flex: 1; }
+  .toggle-name { font-size: 13px; margin-bottom: 2px; }
+  .toggle-desc { font-size: 11px; color: var(--muted); }
+  .toggle {
+    width: 36px; height: 20px;
+    background: var(--border);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background .2s;
+    flex-shrink: 0;
+  }
+  .toggle.on { background: var(--blue); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: white;
+    transition: transform .2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* ─── TICKET DETAIL ─── */
+  .ticket-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+  }
+  .detail-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .detail-block-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 12px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .meta-item .k { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+  .meta-item .v { font-size: 13px; font-weight: 500; }
+  .resolution-box {
+    background: rgba(63,185,80,.06);
+    border: 1px solid rgba(63,185,80,.2);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 12px;
+  }
+  .resolution-title {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .resolution-text {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    outline: none;
+  }
+  .search-input:focus { border-color: var(--blue); }
+  .filter-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">⚡</div>
+    <div>
+      <div class="brand-name">ITSM AI Agent</div>
+      <div class="brand-sub">HCLTech</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill"><div class="status-dot"></div>All systems operational</div>
+    <div class="avatar">JK</div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('dashboard', this)">Dashboard</button>
+  <button class="tab-btn" onclick="switchTab('tickets', this)">Tickets <span class="tab-badge">12</span></button> 
+  <button class="tab-btn" onclick="switchTab('analytics', this)">Analytics</button>  
+</div>
+
+<!-- BODY LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Ticket Queue</div>
+      <div class="sidebar-item active" onclick="switchPanel('dashboard')"><span class="ico">📊</span>Overview</div>
+      
+    </div>    
+  </aside>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- ─── DASHBOARD PANEL ─── -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="stat-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Total Tickets Today</div>
+          <div class="stat-value">284</div>
+          <div class="stat-sub"><span class="up">↑ 18</span> from yesterday</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Auto-Resolved</div>
+          <div class="stat-value">211</div>
+          <div class="stat-sub"><span class="up">74.3%</span> resolution rate</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Avg Resolution Time</div>
+          <div class="stat-value">4.2s</div>
+          <div class="stat-sub"><span class="up">↓ 0.8s</span> vs last week</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">SLA Breaches</div>
+          <div class="stat-value">3</div>
+          <div class="stat-sub"><span class="dn">↑ 2</span> needs attention</div>
+        </div>
+      </div>
+
+    </div>         
+
+    <!-- ─── TICKETS PANEL ─── -->
+    <div class="panel" id="panel-tickets">
+      <div class="search-bar">
+        <input class="search-input" placeholder="Search by ID, summary, assignee..." />
+        <button class="filter-btn">Priority ▾</button>
+        <button class="filter-btn">Source ▾</button>
+        <button class="filter-btn">Status ▾</button>
+        <button class="btn">+ New Ticket</button>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎫 All Tickets <span style="color:var(--muted);font-weight:400;font-size:12px;margin-left:6px">— 284 today</span></div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Summary</th><th>Priority</th><th>Source</th><th>Status</th><th>RAG Confidence</th><th>Assigned</th><th>Age</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8841</td>
+              <td>DB connection pool exhausted on prod-db-02</td>
+              <td><span class="badge critical">CRITICAL</span></td>
+              <td><span class="badge medium">ServiceNow</span></td>
+              <td><span class="badge processing">Processing</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:87%"></div></div><span class="mono">87%</span></div></td>
+              <td style="color:var(--muted)">RAG Agent</td>
+              <td class="mono">2m</td>
+            </tr>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8839</td>
+              <td>Kafka broker unreachable — Region US-East-2</td>
+              <td><span class="badge critical">CRITICAL</span></td>
+              <td><span class="badge medium">Teams</span></td>
+              <td><span class="badge open">Open</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill amber" style="width:54%"></div></div><span class="mono">54%</span></div></td>
+              <td style="color:var(--muted)">Escalated</td>
+              <td class="mono">4m</td>
+            </tr>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8838</td>
+              <td>SSL certificate expiry warning — api-gw</td>
+              <td><span class="badge high">HIGH</span></td>
+              <td><span class="badge medium">Email</span></td>
+              <td><span class="badge pending">Pending</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:92%"></div></div><span class="mono">92%</span></div></td>
+              <td style="color:var(--muted)">RAG Agent</td>
+              <td class="mono">6m</td>
+            </tr>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8837</td>
+              <td>User unable to login — MFA timeout</td>
+              <td><span class="badge medium">MEDIUM</span></td>
+              <td><span class="badge medium">ServiceNow</span></td>
+              <td><span class="badge resolved">Resolved</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:96%"></div></div><span class="mono">96%</span></div></td>
+              <td style="color:var(--muted)">RAG Agent</td>
+              <td class="mono">9m</td>
+            </tr>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8836</td>
+              <td>Slow query performance on reports module</td>
+              <td><span class="badge medium">MEDIUM</span></td>
+              <td><span class="badge medium">Teams</span></td>
+              <td><span class="badge resolved">Resolved</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:79%"></div></div><span class="mono">79%</span></div></td>
+              <td style="color:var(--muted)">RAG Agent</td>
+              <td class="mono">12m</td>
+            </tr>
+            <tr>
+              <td class="mono" style="color:var(--blue)">INC-8835</td>
+              <td>Auth service 503 — repeated failures</td>
+              <td><span class="badge critical">CRITICAL</span></td>
+              <td><span class="badge medium">Email</span></td>
+              <td><span class="badge pending">Pending</span></td>
+              <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill amber" style="width:61%"></div></div><span class="mono">61%</span></div></td>
+              <td style="color:var(--muted)">L2 Team</td>
+              <td class="mono">18m</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>    
+
+    <!-- ─── ANALYTICS PANEL ─── -->
+    <div class="panel" id="panel-analytics">
+      <div class="stat-row">
+        <div class="stat-card blue"><div class="stat-label">Tickets This Week</div><div class="stat-value">1,841</div><div class="stat-sub"><span class="up">↑ 12%</span> vs last week</div></div>
+        <div class="stat-card green"><div class="stat-label">Auto-Resolution Rate</div><div class="stat-value">74%</div><div class="stat-sub"><span class="up">↑ 6pp</span> month on month</div></div>
+        <div class="stat-card purple" style="border-top:2px solid var(--purple)"><div class="stat-label">Avg Confidence</div><div class="stat-value" style="color:var(--purple)">81%</div><div class="stat-sub">across all RAG queries</div></div>
+        <div class="stat-card amber"><div class="stat-label">Escalations</div><div class="stat-value">473</div><div class="stat-sub"><span class="dn">↓ 3%</span> improvement</div></div>
+      </div>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Tickets Resolved per Hour (today)</div>
+        <div class="bar-chart">
+          <div class="bar-col"><div class="bar-rect" style="height:45%;background:var(--blue)"></div><div class="bar-x">06</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:55%;background:var(--blue)"></div><div class="bar-x">07</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:70%;background:var(--blue)"></div><div class="bar-x">08</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:88%;background:var(--blue)"></div><div class="bar-x">09</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:95%;background:var(--blue)"></div><div class="bar-x">10</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:100%;background:var(--blue)"></div><div class="bar-x">11</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:82%;background:var(--blue)"></div><div class="bar-x">12</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:76%;background:var(--blue)"></div><div class="bar-x">13</div></div>
+          <div class="bar-col"><div class="bar-rect" style="height:91%;background:var(--blue)"></div><div class="bar-x">14</div></div>
+        </div>
+      </div>
+
+      <div class="donut-row">
+        <div class="donut-card">
+          <svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--border)" stroke-width="14"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--green)" stroke-width="14" stroke-dasharray="164 56" stroke-dashoffset="25" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--amber)" stroke-width="14" stroke-dasharray="36 184" stroke-dashoffset="-139" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--red)" stroke-width="14" stroke-dasharray="20 200" stroke-dashoffset="-175" transform="rotate(-90 50 50)"/>
+            <text x="50" y="54" text-anchor="middle" fill="var(--text)" font-size="14" font-weight="700" font-family="JetBrains Mono">74%</text>
+          </svg>
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px">Resolution Breakdown</div>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div><div class="legend-label">Auto-resolved</div><div class="legend-val">74%</div></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div><div class="legend-label">Escalated</div><div class="legend-val">16%</div></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><div class="legend-label">SLA breach</div><div class="legend-val">10%</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="donut-card">
+          <svg class="donut-svg" width="100" height="100" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--border)" stroke-width="14"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--blue)" stroke-width="14" stroke-dasharray="132 88" stroke-dashoffset="25" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--purple)" stroke-width="14" stroke-dasharray="55 165" stroke-dashoffset="-107" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="35" fill="none" stroke="var(--amber)" stroke-width="14" stroke-dasharray="33 187" stroke-dashoffset="-162" transform="rotate(-90 50 50)"/>
+            <text x="50" y="54" text-anchor="middle" fill="var(--text)" font-size="12" font-weight="700" font-family="JetBrains Mono">source</text>
+          </svg>
+          <div>
+            <div style="font-size:13px;font-weight:600;margin-bottom:12px">Ticket Sources</div>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div><div class="legend-label">ServiceNow</div><div class="legend-val">60%</div></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div><div class="legend-label">MS Teams</div><div class="legend-val">25%</div></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div><div class="legend-label">Email</div><div class="legend-val">15%</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏷️ Top Incident Categories</div></div>
+        <table>
+          <thead><tr><th>Category</th><th>Count</th><th>Auto-Resolved</th><th>Avg Confidence</th><th>Avg Time</th></tr></thead>
+          <tbody>
+            <tr><td>Database / Connectivity</td><td class="mono">84</td><td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:88%"></div></div><span class="mono">88%</span></div></td><td class="mono" style="color:var(--green)">89%</td><td class="mono">3.2s</td></tr>
+            <tr><td>Authentication / Access</td><td class="mono">72</td><td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:91%"></div></div><span class="mono">91%</span></div></td><td class="mono" style="color:var(--green)">92%</td><td class="mono">2.8s</td></tr>
+            <tr><td>Network / Latency</td><td class="mono">51</td><td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill amber" style="width:62%"></div></div><span class="mono">62%</span></div></td><td class="mono" style="color:var(--amber)">68%</td><td class="mono">5.1s</td></tr>
+            <tr><td>Infrastructure / Infra</td><td class="mono">44</td><td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill amber" style="width:58%"></div></div><span class="mono">58%</span></div></td><td class="mono" style="color:var(--amber)">71%</td><td class="mono">4.8s</td></tr>
+            <tr><td>Application Errors</td><td class="mono">33</td><td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:75%"></div></div><span class="mono">75%</span></div></td><td class="mono" style="color:var(--green)">82%</td><td class="mono">4.0s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>          
+
+  </main>
+</div>
+
+<script> 
+
+  // ─── TAB SWITCHING ───
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  function switchPanel(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+</script>
+</body>
+</html>

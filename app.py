@@ -13,7 +13,7 @@ db=SQLAlchemy(app)
 class User(db.Model):
     username=db.Column(db.String(200),primary_key=True)
     password=db.Column(db.String(200),nullable=False)
-    role=db.Column(db.String(20),nullable=False) # a user maybe admin or User 
+    role=db.Column(db.String(20),nullable=False) # a user maybe agent or User 
 
 class Ticket(db.Model):
     TicketNumber=db.Column(db.Integer,primary_key=True,autoincrement=True)
@@ -53,6 +53,10 @@ def login_page():
 def welcome_page():
     return render_template('welcome.html')
 
+@app.route('/welcome_agent')
+def welcom_agent():
+    return render_template('welcome_agent.html')
+
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
     if(request.method=='POST'):     
@@ -85,4 +89,6 @@ with app.app_context():
     db.create_all()
 
 if __name__=="__main__":
+    print(app.url_map)
     app.run(debug=True,port=5001)
+    
