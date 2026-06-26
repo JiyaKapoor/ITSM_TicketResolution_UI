@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <style>
 /* ─── TICKET TABLE ─── */
@@ -198,6 +200,42 @@ header {
   padding: 9px 14px; color: var(--base);
   font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
 }
+.resolution-button {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace; /* Matches your table style */
+  border-radius: 4px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+/* "Resolve" State (Uses your theme's neon blue token) */
+.resolution-button.resolve-btn {
+  background: rgba(88, 166, 255, 0.1);
+  color: var(--blue);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+}
+
+.resolution-btn.resolve:hover {
+  background: var(--blue);
+  color: #0d1117; /* Dark background value to keep text legible on hover */
+  border-color: var(--blue);
+}
+
+/* "View Resolution" State (Uses your theme's muted/dim look) */
+.resolution-button.view-btn {
+  background: var(--dim);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.resolution-btn.view:hover {
+  background: #57606a; /* Slightly lighter gray than dim on hover */
+  border-color: var(--muted);
+}
+
 </style>
 <body>
 
@@ -220,11 +258,7 @@ header {
 <div class="tab-nav">
   <button class="tab-btn" onclick="window.location.href='/welcome_agent'">Dashboard</button>
   <button class="tab-btn active">Tickets <span class="tab-badge">12</span></button>
-  <button class="tab-btn" onclick="window.location.href='/analytics'">Analytics</button></div>
-
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <button class="tab-btn" onclick="window.location.href='/analytics'">Analytics</button></div>    
     <div class="panel active" id="panel-tickets">    
       <div class="search-bar">
         <input class="search-input" placeholder="Search by ID, summary, assignee..." />
@@ -248,10 +282,17 @@ header {
               <td>{{ticket.shortDesc}}</td>
               <td><span class="badge medium">{{ticket.Priority}}</span></td>
               <td><span class="badge medium">WebUI</span></td>
-              <td><span class="badge resolved">{{ticket.status}}</span></td>
+              <td><span class="badge resolved">{{ticket.Status}}</span></td>
               <td><div class="confidence-bar"><div class="bar-bg"><div class="bar-fill" style="width:96%"></div></div><span class="mono">96%</span></div></td>
               <td style="color:var(--muted)">{{ticket.ResolutionType}}</td>
               <td class="mono">9m</td>
+              <td>
+                <button 
+                  class="resolution-button {% if ticket.Status == 'OPEN' %}resolve-btn{% else %}view-btn{% endif %}"
+                  onclick="handleClick('{{ticket.Status}}','{{ticket.TicketNumber}}')">
+                  {% if ticket.Status == "OPEN" %} Resolve {% else %} View Resolution {% endif %}
+                </button>
+              </td>
             </tr> 
             {% endfor %}          
           </tbody>
@@ -259,5 +300,15 @@ header {
       </div>
     </div>    
 </body>
+<script>
+  const handleClick=(status,ticketId)=>{
+    if(status=="OPEN"){
+      window.location.href=`/resolve_ticket?id=${ticketId}`
+    }
+    else{
+      window.location.href=`/view_resolution?id=${ticketId}`
+    }
+  }
+</script>
 </html>
     

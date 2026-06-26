@@ -91,6 +91,10 @@ def welcom_agent():
 def fetch_all_tickets():
     tickets=Ticket.query.all()
     return render_template("fetch_all_tickets.html",Tickets=tickets)
+@app.route("/resolve_ticket")
+def resolve_ticket():
+    ticket_id=request.args.get("id")
+    return render_template("resolve_ticket.html",id=ticket_id)
 
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
