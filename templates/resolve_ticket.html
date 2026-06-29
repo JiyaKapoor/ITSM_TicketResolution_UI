@@ -261,18 +261,7 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="ticket-title">Microsoft Teams not syncing messages</div>
-      <div class="ticket-meta">
-        <span class="pill pill-p3">P3</span>
-        <span class="pill pill-web">WebUI</span>
-        <span class="pill pill-open">OPEN</span>
-        <span class="pill pill-age">9m ago</span>
-        <div class="rag-row">
-          <div class="rag-bar-wrap"><div class="rag-bar" style="width:96%"></div></div>
-          <span class="rag-pct">96%</span>
-          <span>RAG confidence</span>
-        </div>
-      </div>
+      <div class="ticket-title">Microsoft Teams not syncing messages</div>      
     </div>
   </div>
 
@@ -283,7 +272,6 @@
       <!-- Resolution Form -->
       <div class="card">
         <div class="card-title">Resolution Details</div>
-
         <div class="field">
           <label>Resolution Note *</label>
           <textarea id="resolutionNote" placeholder="Describe the steps taken to resolve this ticket…"></textarea>
@@ -303,11 +291,11 @@
       <!-- Ticket Info -->
       <div class="card">
         <div class="card-title">Ticket Info</div>
-        <div class="info-row"><span class="info-key">Ticket ID</span><span class="info-value">#1</span></div>
-        <div class="info-row"><span class="info-key">Source</span><span class="info-value"><span class="pill pill-web">WebUI</span></span></div>
-        <div class="info-row"><span class="info-key">Priority</span><span class="info-value"><span class="pill pill-p3">P3</span></span></div>
-        <div class="info-row"><span class="info-key">Status</span><span class="info-value"><span class="pill pill-open">OPEN</span></span></div>
-        <div class="info-row"><span class="info-key">Created</span><span class="info-value">9 minutes ago</span></div>
+        <div class="info-row"><span class="info-key">{{Ticket.TicketNumber}}</span><span class="info-value">#1</span></div>
+        <div class="info-row"><span class="info-key">WebUI</span><span class="info-value"><span class="pill pill-web">WebUI</span></span></div>
+        <div class="info-row"><span class="info-key">{{Ticket.Priority}}</span><span class="info-value"><span class="pill pill-p3">P3</span></span></div>
+        <div class="info-row"><span class="info-key">{{Ticket.Status}}</span><span class="info-value"><span class="pill pill-open">OPEN</span></span></div>
+        <div class="info-row"><span class="info-key"></span><span class="info-value">9 minutes ago</span></div>
         <div class="info-row"><span class="info-key">SLA Deadline</span><span class="info-value" style="color:var(--yellow)" id="slaTimer">—</span></div>
         <div class="info-row"><span class="info-key">Assigned To</span><span class="info-value">None</span></div>
         <div class="info-row"><span class="info-key">Reporter</span><span class="info-value">via WebUI</span></div>
