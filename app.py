@@ -56,14 +56,17 @@ def login_page():
             #only if the user exists in the db and the passwords match only then are we allowing the user to enter the system
             session['useremail']=useremail
             session['role']=user.role
-            return redirect('/welcome')
+            if(user.role=="AGENT"):
+                return redirect('/welcome_agent')
+            else:
+                return redirect('/welcome_user')
         else:
             return "Invalid Credentials"
     return render_template('login.html')
 
 #creating landing page endpoint
-@app.route('/welcome')
-def welcome_page():
+@app.route('/welcome_user')
+def welcome_user():
     return render_template('welcome.html')
 
 @app.route('/welcome_agent')
@@ -91,6 +94,7 @@ def welcom_agent():
 def fetch_all_tickets():
     tickets=Ticket.query.all()
     return render_template("fetch_all_tickets.html",Tickets=tickets)
+
 @app.route("/resolve_ticket")
 def resolve_ticket():
     ticket_id=request.args.get("id")
