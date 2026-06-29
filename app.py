@@ -44,6 +44,19 @@ class TicketStats(db.Model):
 def hello_world():
     return 'Hello World!'
 
+# creating a Jinja filter
+@app.template_filter('timeago')
+def timeago(value):
+    diff=datetime.now()-value
+    seconds=int(diff.total_seconds())
+    if seconds<60:
+        return f"{seconds} seconds ago"
+    elif seconds<3600:
+        return f"{seconds//60} minutes ago"
+    elif seconds<86400:
+        return f"{seconds//3600} hours ago"
+    else:
+        return f"{diff.days} days ago"
 
 @app.route('/login',methods=['POST','GET'])
 def login_page():
@@ -99,7 +112,8 @@ def fetch_all_tickets():
 @app.route("/resolve_ticket")
 def resolve_ticket():
     ticket_id=request.args.get("id")
-    return render_template("resolve_ticket.html",id=ticket_id)
+    ticket=Ticket.query.filter_by(TicketNumber=ticket_id).first()
+    return render_template("resolve_ticket.html",Ticket=ticket)
 
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
