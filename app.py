@@ -88,7 +88,8 @@ def welcom_agent():
     ticketstats=TicketStats(tickets_today=tickets_today,auto_resolved=num_auto_resolved,avg_resolution_time=avg_resolution_time,sla_breaches=sla_breaches)
     # the significance of using .all() here is that The .all() method executes the database query and returns the results as a standard Python list containing your model objects (here Ticket object)
     # without all, it returns a pending query object which we cant loop through 
-    return render_template('welcome_agent.html',TicketStats=ticketstats)
+    tickets=Ticket.query.all()
+    return render_template('welcome_agent.html',TicketStats=ticketstats,Tickets=tickets)
 
 @app.route("/agent/tickets")
 def fetch_all_tickets():
