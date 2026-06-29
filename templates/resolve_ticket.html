@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resolve Ticket — ITSM AI Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #111318;
+      --surface:   #1a1d24;
+      --surface2:  #22262f;
+      --border:    #2c3040;
+      --accent:    #4f8ef7;
+      --accent-dim:#1e3a6e;
+      --green:     #22c55e;
+      --green-dim: #14532d;
+      --yellow:    #f59e0b;
+      --red:       #ef4444;
+      --muted:     #6b7280;
+      --text:      #e2e8f0;
+      --text-sub:  #94a3b8;
+      --p3:        #3b82f6;
+      --badge-web: #2563eb;
+      --radius:    8px;
+      --font:      'Inter', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-left { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, #7c3aed, #f59e0b);
+      border-radius: 8px;
+      display: grid; place-items: center;
+      font-size: 16px;
+    }
+    .nav-brand { font-weight: 600; font-size: 15px; }
+    .nav-brand span { display: block; font-size: 11px; color: var(--muted); font-weight: 400; }
+    .nav-tabs { display: flex; gap: 0; }
+    .nav-tab {
+      padding: 0 18px; height: 56px;
+      display: flex; align-items: center; gap: 6px;
+      color: var(--text-sub); font-size: 14px;
+      text-decoration: none; border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+    .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .nav-tab:hover:not(.active) { color: var(--text); }
+    .badge {
+      background: #ef4444; color: #fff;
+      font-size: 11px; font-weight: 700;
+      border-radius: 10px; padding: 1px 6px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .status-pill {
+      display: flex; align-items: center; gap: 6px;
+      border: 1px solid #166534; color: #4ade80;
+      font-size: 12px; padding: 4px 10px; border-radius: 20px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: grid; place-items: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      padding: 14px 24px 0;
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text-sub);
+    }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+
+    /* ── MAIN LAYOUT ── */
+    .page { padding: 20px 24px 40px; max-width: 1200px; margin: 0 auto; }
+
+    .page-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between; margin-bottom: 24px;
+    }
+    .ticket-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+    .ticket-meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    .pill {
+      padding: 3px 10px; border-radius: 6px;
+      font-size: 12px; font-weight: 600; letter-spacing: .3px;
+    }
+    .pill-p3    { background: var(--p3);       color: #fff; }
+    .pill-web   { background: var(--badge-web); color: #fff; }
+    .pill-open  { background: var(--green-dim); color: var(--green); border: 1px solid #166534; }
+    .pill-age   { background: var(--surface2);  color: var(--text-sub); }
+
+    .rag-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sub); }
+    .rag-bar-wrap { width: 80px; height: 6px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .rag-bar { height: 100%; background: var(--green); border-radius: 4px; }
+    .rag-pct { color: var(--text); font-weight: 600; }
+
+    /* ── GRID ── */
+    .grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-sub); text-transform: uppercase;
+      letter-spacing: .6px; margin-bottom: 14px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+
+    /* ── AI SUGGESTION ── */
+    .ai-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--yellow); font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .ai-label svg { flex-shrink: 0; }
+    .suggestion-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      font-size: 13px; line-height: 1.65; color: var(--text);
+      margin-bottom: 16px;
+    }
+    .suggestion-box ol { padding-left: 18px; margin-top: 6px; }
+    .suggestion-box li { margin-bottom: 4px; }
+
+    /* ── RESOLUTION FORM ── */
+    label { display: block; font-size: 12px; color: var(--text-sub); margin-bottom: 6px; font-weight: 500; }
+    textarea, select, input[type="text"] {
+      width: 100%; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-family: var(--font); font-size: 13px;
+      padding: 10px 12px; outline: none; resize: vertical;
+      transition: border-color .15s;
+    }
+    textarea:focus, select:focus, input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+    textarea { min-height: 120px; }
+    select { appearance: none; cursor: pointer; }
+    .field { margin-bottom: 16px; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* use suggestion btn */
+    .use-suggestion {
+      background: none; border: 1px solid var(--accent);
+      color: var(--accent); border-radius: 6px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+      margin-bottom: 16px;
+    }
+    .use-suggestion:hover { background: var(--accent-dim); }
+
+    /* actions */
+    .actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn {
+      padding: 9px 20px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      border: none; transition: opacity .15s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger  { background: #7f1d1d; color: #fca5a5; border: 1px solid #991b1b; }
+
+    /* ── SIDEBAR ── */
+    .info-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 9px 0; border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-key   { color: var(--text-sub); }
+    .info-value { color: var(--text); font-weight: 500; text-align: right; max-width: 55%; }
+
+    /* ── ACTIVITY ── */
+    .activity-list { display: flex; flex-direction: column; gap: 0; }
+    .activity-item {
+      display: flex; gap: 12px; padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .a-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--surface2); display: grid;
+      place-items: center; flex-shrink: 0; font-size: 13px;
+    }
+    .a-body { flex: 1; }
+    .a-line { font-size: 13px; line-height: 1.5; }
+    .a-line strong { color: var(--text); }
+    .a-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(60px);
+      background: var(--green); color: #fff;
+      padding: 11px 22px; border-radius: 8px;
+      font-size: 13px; font-weight: 600;
+      opacity: 0; transition: transform .3s ease, opacity .3s ease;
+      pointer-events: none; z-index: 999;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <div class="logo-icon">⚡</div>
+    <div class="nav-brand">ITSM AI Agent <span>HCLTech</span></div>
+  </div>  
+  <div class="nav-right">
+    <div class="status-pill"><div class="dot"></div> All Systems Operational</div>
+    <div class="avatar">JY</div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <a href="#">Tickets</a>
+  <span>›</span>
+  <span>Ticket #1 — Resolve</span>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+  <div class="page-header">
+    <div>
+      <div class="ticket-title">Microsoft Teams not syncing messages</div>
+      <div class="ticket-meta">
+        <span class="pill pill-p3">P3</span>
+        <span class="pill pill-web">WebUI</span>
+        <span class="pill pill-open">OPEN</span>
+        <span class="pill pill-age">9m ago</span>
+        <div class="rag-row">
+          <div class="rag-bar-wrap"><div class="rag-bar" style="width:96%"></div></div>
+          <span class="rag-pct">96%</span>
+          <span>RAG confidence</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid">
+
+    <div style="display:flex;flex-direction:column;gap:18px;">     
+
+      <!-- Resolution Form -->
+      <div class="card">
+        <div class="card-title">Resolution Details</div>
+
+        <div class="field">
+          <label>Resolution Note *</label>
+          <textarea id="resolutionNote" placeholder="Describe the steps taken to resolve this ticket…"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="resolveTicket()">✓ Mark as Resolved</button>
+          <button class="btn btn-ghost" onclick="saveAndClose()">Save Draft</button>
+          <button class="btn btn-danger" onclick="closeInvalid()">Close as Invalid</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div style="display:flex;flex-direction:column;gap:18px;">
+
+      <!-- Ticket Info -->
+      <div class="card">
+        <div class="card-title">Ticket Info</div>
+        <div class="info-row"><span class="info-key">Ticket ID</span><span class="info-value">#1</span></div>
+        <div class="info-row"><span class="info-key">Source</span><span class="info-value"><span class="pill pill-web">WebUI</span></span></div>
+        <div class="info-row"><span class="info-key">Priority</span><span class="info-value"><span class="pill pill-p3">P3</span></span></div>
+        <div class="info-row"><span class="info-key">Status</span><span class="info-value"><span class="pill pill-open">OPEN</span></span></div>
+        <div class="info-row"><span class="info-key">Created</span><span class="info-value">9 minutes ago</span></div>
+        <div class="info-row"><span class="info-key">SLA Deadline</span><span class="info-value" style="color:var(--yellow)" id="slaTimer">—</span></div>
+        <div class="info-row"><span class="info-key">Assigned To</span><span class="info-value">None</span></div>
+        <div class="info-row"><span class="info-key">Reporter</span><span class="info-value">via WebUI</span></div>
+      </div>     
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">✓ Ticket resolved successfully</div>
+
+<script>
+  // SLA countdown — P3 = 4h SLA from creation (9min ago → ~3h51m left)
+  const slaMs = (4 * 60 - 9) * 60 * 1000;
+  let remaining = slaMs;
+  const slaEl = document.getElementById('slaTimer');
+
+  function formatSLA(ms) {
+    if (ms <= 0) return '⚠ SLA Breached';
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    const s = Math.floor((ms % 60000) / 1000);
+    return `${h}h ${m}m ${s}s remaining`;
+  }
+
+  setInterval(() => {
+    remaining -= 1000;
+    slaEl.textContent = formatSLA(remaining);
+    slaEl.style.color = remaining < 1800000 ? 'var(--red)' : 'var(--yellow)';
+  }, 1000);
+  slaEl.textContent = formatSLA(remaining);
+
+  // Fill suggestion into textarea
+  function fillSuggestion() {
+    const note = `Signed the user out of Microsoft Teams on all devices and cleared the local Teams cache (%appdata%\\Microsoft\\Teams). Re-authenticated via M365 admin portal with a forced token refresh. Issue resolved — message sync restored. Verified with user.`;
+    document.getElementById('resolutionNote').value = note;
+    document.getElementById('rootCause').value = 'Authentication / Token Expiry';
+    document.getElementById('resolutionCat').value = 'Remote Assistance';
+  }
+
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color || 'var(--green)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function addActivity(icon, html) {
+    const list = document.getElementById('activityList');
+    const el = document.createElement('div');
+    el.className = 'activity-item';
+    el.innerHTML = `<div class="a-icon">${icon}</div><div class="a-body"><div class="a-line">${html}</div><div class="a-time">just now</div></div>`;
+    list.prepend(el);
+  }
+
+  function resolveTicket() {
+    const note = document.getElementById('resolutionNote').value.trim();
+    if (!note) {
+      document.getElementById('resolutionNote').style.borderColor = 'var(--red)';
+      setTimeout(() => document.getElementById('resolutionNote').style.borderColor = '', 1500);
+      return;
+    }
+    addActivity('✓', '<strong>Ticket resolved</strong> — ' + note.slice(0, 60) + (note.length > 60 ? '…' : ''));
+    showToast('✓ Ticket resolved successfully', 'var(--green)');
+  }
+
+  function saveAndClose() {
+    addActivity('💾', 'Resolution note <strong>saved as draft</strong>');
+    showToast('Draft saved', '#6366f1');
+  }
+
+  function closeInvalid() {
+    if (!confirm('Mark this ticket as Invalid? This action will close the ticket without resolution.')) return;
+    addActivity('✗', 'Ticket <strong>closed as invalid</strong>');
+    showToast('✗ Ticket closed as invalid', 'var(--red)');
+  }
+</script>
+</body>
+</html>
