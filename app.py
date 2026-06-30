@@ -89,20 +89,28 @@ def welcom_agent():
     tickets_today=Ticket.query.filter(Ticket.CreatedAt>=date.today()).count()
     print(tickets_today)
     num_auto_resolved=Ticket.query.filter(Ticket.ResolutionType=="AUTO").count()
-    avg_resolution_time = db.session.execute(
-        db.select(
-            func.avg(
-                func.extract('epoch', Ticket.ResolvedAt - Ticket.CreatedAt) / 60
-            )
-        ).where(Ticket.ResolvedAt > date.today())
-    ).scalar()
-    avg_resolution_time = int(avg_resolution_time or 0)
+    #Fetching only the timestamps for resolved tickets
+    tickets = db.session.query(Ticket.CreatedAt, Ticket.ResolvedAt).filter(
+        Ticket.ResolvedAt.isnot(None),Ticket.CreatedAt>=datetime.today()
+    ).all()
+
+    #Using a simple Python loop to find the total differences in minutes
+    if tickets:
+        total_minutes = sum((t.ResolvedAt - t.CreatedAt).total_seconds() / 60 for t in tickets)
+        avg_minutes = total_minutes / len(tickets)
+        print(f"Average resolution time: {avg_minutes:.2f} minutes")
+    else:
+        avg_minutes = 0
+    print(avg_minutes)
+    
+   
     sla_breaches=Ticket.query.filter((Ticket.ResolvedAt>Ticket.Sla_due) | (Ticket.Sla_due<datetime.now())).count()
-    ticketstats=TicketStats(tickets_today=tickets_today,auto_resolved=num_auto_resolved,avg_resolution_time=avg_resolution_time,sla_breaches=sla_breaches)
+    ticketstats=TicketStats(tickets_today=tickets_today,auto_resolved=num_auto_resolved,avg_resolution_time=avg_minutes,sla_breaches=sla_breaches)
     # the significance of using .all() here is that The .all() method executes the database query and returns the results as a standard Python list containing your model objects (here Ticket object)
     # without all, it returns a pending query object which we cant loop through 
     tickets=Ticket.query.all()
     return render_template('welcome_agent.html',TicketStats=ticketstats,Tickets=tickets)
+    
 
 @app.route("/agent/tickets")
 def fetch_all_tickets():
