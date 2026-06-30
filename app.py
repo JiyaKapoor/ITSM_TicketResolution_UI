@@ -91,7 +91,7 @@ def welcome_agent():
     num_auto_resolved=Ticket.query.filter(Ticket.ResolutionType=="AUTO").count()
     #Fetching only the timestamps for resolved tickets
     tickets = db.session.query(Ticket.CreatedAt, Ticket.ResolvedAt).filter(
-        Ticket.ResolvedAt.isnot(None),Ticket.CreatedAt>=datetime.today()
+        Ticket.ResolvedAt.isnot(None),Ticket.CreatedAt>=func.current_date()
     ).all()
 
     #Using a simple Python loop to find the total differences in minutes
