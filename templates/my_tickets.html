@@ -140,24 +140,60 @@ body{
 
             <div class="ticket-desc">
                 {{ ticket.longDesc }}
+            </div>           
+            
+        
+
+        {% if ticket.Resolution %}
+            <div class="resolution-actions" style="margin-top: 15px; display: flex; justify-content: flex-end; width: 100%;">
+            <button type="button" onclick="toggleResolution('{{ticket.TicketNumber}}')" style="background-color: #00bcd4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                View Resolution
+            </button>
+            </div>           
+
+            <div id="resolutionBox-{{ticket.TicketNumber}}" style="display: none; margin-top: 15px; padding: 15px; background-color: #ffffff; color: #333333; border-radius: 4px; border-left: 5px solid #00bcd4; width: 100%; box-sizing: border-box;">
+                <strong style="color: #00bcd4; display: block; margin-bottom: 5px;">Resolution:</strong>
+                <span style="color: #111111; word-wrap: break-word;">{{ ticket.Resolution }}</span>
+                {% if ticket.Status=="OPEN" %}
+                <button type="button" onclick="acceptResolution('{{ticket.TicketNumber}}')" style="background-color: chartreuse; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Accept Resolution</button>
+                {% endif %}
+
             </div>
 
-            <div class="ticket-footer">
-                {% if ticket.Status == 'OPEN' %}
-                    <span class="badge-status open">OPEN</span>
+            <script>
+            function acceptResolution(ticketId){
+                // now I want that once the user accepts the resolution, the status must be set to CLOSED and the 
+                //Basically in a java script function we cannot change a server side variable 
+                // the right way to go about it is to send a call to the flask API end point
+                fetch(`/close_ticket/${ticketId}`,{method:'POST',headers:{'Content-Type':'application/json'}})
+            }
+            function toggleResolution(ticketId) {
+                var box = document.getElementById("resolutionBox-"+ticketId);
+                if (box.style.display === "none" || box.style.display === "") {
+                    box.style.display = "block";
+                } else {
+                    box.style.display = "none";
+                }
+            }
+            </script>
+        {% endif %}
 
-                {% elif ticket.Status == 'IN_PROGRESS' %}
-                    <span class="badge-status inprogress">
-                        IN PROGRESS
-                    </span>
+        <div class="ticket-footer">
+            {% if ticket.Status == 'OPEN' %}
+                <span class="badge-status open">OPEN</span>
 
-                {% else %}
-                    <span class="badge-status closed">
-                        CLOSED
-                    </span>
-                {% endif %}                
+            {% elif ticket.Status == 'IN_PROGRESS' %}
+                <span class="badge-status inprogress">
+                    IN PROGRESS
+                </span>
 
-            </div>
+            {% else %}
+                <span class="badge-status closed">
+                    CLOSED
+                </span>
+            {% endif %}                
+
+        </div>
 
         </div>
 
