@@ -256,12 +256,11 @@
   <a href="/agent/tickets">Tickets</a>
   <span>›</span>  
 </div>
-
 <!-- PAGE -->
 <div class="page">
   <div class="page-header">
     <div>
-      <div class="ticket-title">Microsoft Teams not syncing messages</div>      
+      <div class="ticket-title">{{Ticket.shortDesc}}</div>      
     </div>
   </div>
 
@@ -270,11 +269,12 @@
     <div style="display:flex;flex-direction:column;gap:18px;">     
 
       <!-- Resolution Form -->
+       <form action="" method="POST">       
       <div class="card">
         <div class="card-title">Resolution Details</div>
         <div class="field">
           <label>Resolution Note *</label>
-          <textarea id="resolutionNote" placeholder="Describe the steps taken to resolve this ticket…"></textarea>
+          <textarea id="resolutionNote" placeholder="Describe the steps taken to resolve this ticket…" name="resolution"></textarea>
         </div>
         <div class="actions">
           <button class="btn btn-primary" onclick="resolveTicket()">✓ Mark as Resolved</button>
@@ -282,6 +282,9 @@
           <button class="btn btn-danger" onclick="closeInvalid()">Close as Invalid</button>
         </div>
       </div>
+      </div>
+      </div>
+    </form>
 
     </div>
 
@@ -303,6 +306,8 @@
     </div>
   </div>
 </div>
+
+
 
 <!-- TOAST -->
 <div id="toast">✓ Ticket resolved successfully</div>
