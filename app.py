@@ -109,10 +109,21 @@ def fetch_all_tickets():
     tickets=Ticket.query.all()
     return render_template("fetch_all_tickets.html",Tickets=tickets)
 
-@app.route("/resolve_ticket")
+@app.route("/resolve_ticket",methods=['GET','POST'])
 def resolve_ticket():
-    ticket_id=request.args.get("id")
+    ticket_id=request.args.get('id',type=int)
+    print(ticket_id)
+    if request.method=='POST':
+        resolution=request.form['resolution']        
+        #now we need to save this resolution in our db
+        print(ticket_id)
+        ticket=Ticket.query.filter_by(TicketNumber=ticket_id).first()
+        if ticket==None:
+            print("Ticket not found")
+        ticket.Resolution=resolution
+        db.session.commit()
     ticket=Ticket.query.filter_by(TicketNumber=ticket_id).first()
+    print(ticket)
     return render_template("resolve_ticket.html",Ticket=ticket)
 
 
