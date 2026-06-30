@@ -115,6 +115,16 @@ def resolve_ticket():
     ticket=Ticket.query.filter_by(TicketNumber=ticket_id).first()
     return render_template("resolve_ticket.html",Ticket=ticket)
 
+
+@app.route("/close_ticket/<ticket_id>",methods=['POST'])
+def close_ticket(ticket_id):    
+    print(ticket_id)
+    ticket=Ticket.query.filter_by(TicketNumber=ticket_id).first()
+    ticket.Status="CLOSED"
+    ticket.ResolvedAt=datetime.now() # we set the resolution time of the ticket to now 
+    db.session.commit()
+    print("Ticket successfully closed")
+
 @app.route('/raise_ticket',methods=['GET','POST'])
 def raise_ticket():    
     if(request.method=='POST'):     
