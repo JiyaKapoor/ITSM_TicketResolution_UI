@@ -83,7 +83,7 @@ def welcome_user():
     return render_template('welcome.html')
 
 @app.route('/welcome_agent')
-def welcom_agent():
+def welcome_agent():
     #on the welcome page, we need to show stats to the agent (daily ticket stat)
     # for that we query the data from our tickets table and wrap it in the ticketStatus class which is then sent to the welcome_agent.html and rendered via jinja2template
     tickets_today=Ticket.query.filter(Ticket.CreatedAt>=date.today()).count()
