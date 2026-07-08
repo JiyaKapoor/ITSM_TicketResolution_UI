@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raise Ticket</title>
+
+<style>
+:root{
+    --bg:#0f172a;
+    --card:#111827;
+    --input:#1e293b;
+    --border:#334155;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --accent:#3b82f6;
+    --accent-hover:#2563eb;
+    --red:#ef4444;
+    --yellow:#f59e0b;
+    --green:#22c55e;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,Segoe UI,sans-serif;
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+}
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:32px;
+}
+
+h1{
+    font-size:36px;
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:var(--muted);
+    margin-bottom:32px;
+}
+
+.section{
+    margin-bottom:28px;
+}
+
+label{
+    display:block;
+    margin-bottom:8px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--muted);
+}
+.choice-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.choice {
+    padding: 12px 18px;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #1e293b;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.choice:hover {
+    border-color: #3b82f6;
+    transform: translateY(-2px);
+}
+
+.choice.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.p1.selected {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+.p2.selected {
+    background: #d97706;
+    border-color: #d97706;
+}
+
+.p3.selected {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+input,textarea{
+    width:100%;
+    background:var(--input);
+    border:1px solid var(--border);
+    color:var(--text);
+    border-radius:10px;
+    padding:12px;
+    font-size:14px;
+}
+
+textarea{
+    min-height:140px;
+    resize:vertical;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:12px;
+}
+
+.choice{
+    border:1px solid var(--border);
+    background:var(--input);
+    border-radius:10px;
+    padding:14px;
+    cursor:pointer;
+    text-align:center;
+}
+
+.choice.selected{
+    border-color:var(--accent);
+    background:rgba(59,130,246,.15);
+}
+
+.priority{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.submit{
+    margin-top:24px;
+    width:100%;
+    border:none;
+    background:var(--accent);
+    color:white;
+    border-radius:10px;
+    padding:14px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.submit:hover{
+    background:var(--accent-hover);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Raise a Ticket</h1>    
+
+    <form action="/raise_ticket" method="POST">
+        <div class="card">
+            <div class="section">
+                <label>Short Description *</label>
+                <input type="text" name="shortDesc">
+            </div>
+            <div class="section">
+                <label>Detailed Description</label>    
+                <input type="text" name="longDesc">            
+            </div>
+            <div class="section">
+    <label>Issue Type *</label>
+
+    <input type="hidden" name="issueType" id="issueType">
+
+    <div class="choice-container">
+        <div class="choice" onclick="selectOption(this,'Hardware','issueType')">
+            💻 Hardware
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Software','issueType')">
+            ⚙️ Software
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Network','issueType')">
+            🌐 Network
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Email','issueType')">
+            📧 Email
+        </div>
+
+        <div class="choice" onclick="selectOption(this,'Other','issueType')">
+            📋 Other
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <label>Priority</label>
+
+    <input type="hidden" name="priority" id="priority">
+
+    <div class="choice-container">
+        <div class="choice priority p1"
+             onclick="selectOption(this,'P1','priority')">
+            🔴 P1
+        </div>
+
+        <div class="choice priority p2"
+             onclick="selectOption(this,'P2','priority')">
+            🟡 P2
+        </div>
+
+        <div class="choice priority p3"
+             onclick="selectOption(this,'P3','priority')">
+            🔵 P3
+        </div>
+    </div>
+</div>
+
+            <button class="submit" type="submit">
+                Submit Ticket
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+
+function selectOption(element, value, fieldId) {
+
+    document.getElementById(fieldId).value = value;
+
+    element.parentElement
+        .querySelectorAll('.choice')
+        .forEach(c => c.classList.remove('selected'));
+
+    element.classList.add('selected');
+}
+document.querySelectorAll('.choice').forEach(card=>{
+    card.addEventListener('click',()=>{
+        const parent=card.parentElement;
+
+        if(parent.classList.contains('grid') || parent.classList.contains('priority')){
+            parent.querySelectorAll('.choice')
+                  .forEach(c=>c.classList.remove('selected'));
+
+            card.classList.add('selected');
+        }
+    });
+});
+</script>
+
+</body>
+</html>
