@@ -178,7 +178,8 @@ def raise_ticket():
 
 @app.route('/accept_resolution')
 def accept_rag_resolution():
-    
+    ticket_number=request.args.get("ticket_number")
+
 @app.route('/my_tickets')
 def fetch_my_tickets():
     # we now need to query the database to fetch tickets with the required user email id 
