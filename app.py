@@ -175,6 +175,10 @@ def raise_ticket():
         
     return render_template('raise_ticket.html')
 
+
+@app.route('/accept_resolution')
+def accept_rag_resolution():
+    
 @app.route('/my_tickets')
 def fetch_my_tickets():
     # we now need to query the database to fetch tickets with the required user email id 
