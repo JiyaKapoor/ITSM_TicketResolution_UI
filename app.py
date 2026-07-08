@@ -180,6 +180,7 @@ def raise_ticket():
 def accept_rag_resolution():
     ticket_number=request.args.get("ticket_number")
     ticket=Ticket.query.filter_by(Ticket.TicketNumber==ticket_number).first()
+    # we now need to set the resolution provided by rag in the DB to be later rendered to the user
 
 @app.route('/my_tickets')
 def fetch_my_tickets():
