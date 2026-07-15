@@ -1,15 +1,15 @@
-from flask import Flask,render_template,request,session,redirect
+from flask import Flask,render_template,request,session,redirect,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func,or_
 from datetime import datetime
 from datetime import date,timedelta
 from langchain_core.documents import Document
-from Agent.splitter import save_to_qdrant
-from Agent.RAGAgent import provide_resolution
+from find_relevant_tickets import find_relevant_tickets
+
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql://postgres:jiya123@localhost:5432/itsm_db'
+    'sqlite:///itsm_ticket_resolution'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db=SQLAlchemy(app)
@@ -35,7 +35,7 @@ class Ticket(db.Model):
     
 
 class TicketStats(db.Model):    
-    id = db.Column(db.Integer, primary_key=True,auto_increment=True)
+    id = db.Column(db.Integer, primary_key=True,autoincrement=True)
     tickets_today=db.Column(db.Integer)
     auto_resolved=db.Column(db.Integer)
     avg_resolution_time=db.Column(db.Integer)
@@ -157,6 +157,8 @@ def raise_ticket():
         issueType=request.form['issueType']
         priority=request.form['priority'] # all these fields shortDesc, longDesc are coming populated from the frontend 
         UserEmail=session['useremail'] # user email is taken from the current session only 
+        suggestions=find_relevant_tickets(shortDesc)      
+        
         if(priority=="P1"):
             sla_due=datetime.now() + timedelta(hours=4)
         elif(priority=="P2"):
@@ -170,8 +172,7 @@ def raise_ticket():
         print("Count: ",Ticket.query.count())
         for t in Ticket.query.all():
             print(t.shortDesc)
-        rag_resolution=provide_resolution(shortDesc)
-        return render_template('RAG_response.html',resolution=rag_resolution,ticket=ticket)    
+        
         
     return render_template('raise_ticket.html')
 
@@ -189,12 +190,20 @@ def fetch_my_tickets():
     tickets=Ticket.query.filter_by(UserEmail=email).all()
     return render_template("my_tickets.html",tickets=tickets)#we are sending the filtered tickets to the frontend via the render_template method 
 
-with app.app_context():
-    print(db.engine.url)
-    print(db.metadata.tables.keys())
-    db.create_all()
 
-if __name__=="__main__":
-    print(app.url_map)
-    app.run(debug=True,port=5001)
+@app.route('/suggest_resolutions',methods=['POST'])
+def suggest_resolutions():
+    #this will be receiving data in JSON format
+    data=request.get_json()
+    new_ticket_description=data.get('description','')
+    suggestions=find_relevant_tickets(new_ticket_description)
+    print(suggestions)
+    return jsonify(suggestions)
+
+with app.app_context():
+    db.create_all()   
+    print("USer entry added")
     
+
+if __name__=="__main__":    
+    app.run(debug=True,port=5001)
