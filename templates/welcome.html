@@ -32,7 +32,8 @@
     }
 
     .shell {
-      max-width: 1280px;
+      width: 100%;
+      max-width: 100%;
       margin: 0 auto;
       padding: 24px;
     }
@@ -94,9 +95,7 @@
     }
 
     .hero {
-      display: grid;
-      grid-template-columns: 1.5fr 0.9fr;
-      gap: 20px;
+      display: block;
       margin-bottom: 20px;
     }
 
@@ -110,7 +109,8 @@
     }
 
     .hero-card {
-      padding: 30px;
+      padding: 34px;
+      width: 100%;
     }
 
     .hero-card h1 {
@@ -187,7 +187,7 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 16px;
       margin-bottom: 20px;
     }
@@ -225,7 +225,6 @@
     }
 
     @media (max-width: 900px) {
-      .hero,
       .grid-two,
       .stats {
         grid-template-columns: 1fr;

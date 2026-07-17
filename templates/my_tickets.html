@@ -6,221 +6,660 @@
 <title>My Tickets</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-    --bg: #0f172a;
-    --card: #111827;
-    --border: #1f2937;
-    --text: #f8fafc;
-    --text-muted: #94a3b8;
-    --accent: #3b82f6;
+:root{
+    --bg:#EEF1F6;
+    --surface:#FFFFFF;
+    --surface-2:#F7F9FC;
+    --border:#E3E8F0;
+    --border-strong:#D3DAE6;
+
+    --text:#101828;
+    --text-muted:#5D6B82;
+    --text-faint:#98A2B3;
+
+    --primary:#12294F;
+    --primary-2:#1D3D73;
+    --accent:#0C8599;
+    --accent-soft:#E4F6F8;
+
+    --danger:#D92D20;
+    --danger-soft:#FDEDEB;
+    --warning:#B54708;
+    --warning-soft:#FEF6E7;
+    --success:#0F7A47;
+    --success-soft:#E7F7EE;
+
+    --radius-lg:16px;
+    --radius-md:12px;
+    --radius-sm:8px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+    --shadow-md:0 8px 24px -8px rgba(16,24,40,.14);
 }
+
+*{ box-sizing:border-box; }
 
 body{
-    background: var(--bg);
-    color: var(--text);
-    font-family: Inter, sans-serif;
+    background:
+        radial-gradient(1100px 380px at 12% -10%, #EAF3F5 0%, transparent 60%),
+        var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
     min-height:100vh;
-    padding:40px;
+    padding:0 0 64px 0;
 }
 
-.page-header{
+.shell{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 28px;
+}
+
+/* ---------- Top bar ---------- */
+.topbar{
+    background:var(--primary);
+    background:linear-gradient(180deg, var(--primary) 0%, var(--primary-2) 130%);
+    padding:20px 0 84px 0;
+    margin-bottom:-64px;
+}
+.topbar-inner{
+    max-width:900px;
+    margin:0 auto;
+    padding:0 28px;
     display:flex;
-    justify-content:space-between;
     align-items:center;
-    margin-bottom:32px;
+    justify-content:space-between;
 }
-
-.page-title{
-    font-size:32px;
+.brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.brand-mark{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-family:'Lexend',sans-serif;
     font-weight:700;
+    font-size:14px;
+    letter-spacing:.02em;
+}
+.brand-name{
+    color:#fff;
+    font-family:'Lexend',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:.01em;
+    line-height:1.2;
+}
+.brand-sub{
+    color:rgba(255,255,255,.55);
+    font-size:12px;
+    line-height:1.2;
+}
+.topbar .btn-raise{
+    background:#fff;
+    color:var(--primary);
+    border:none;
+    font-weight:600;
+    font-size:14px;
+    padding:10px 18px;
+    border-radius:var(--radius-sm);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 1px 2px rgba(0,0,0,.08);
+}
+.topbar .btn-raise:hover{
+    color:var(--primary);
+    transform:translateY(-1px);
+    box-shadow:0 6px 16px rgba(0,0,0,.18);
 }
 
+/* ---------- Page heading card ---------- */
+.page-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
+    padding:26px 28px;
+    margin-bottom:28px;
+}
+.page-title{
+    font-family:'Lexend',sans-serif;
+    font-size:23px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:4px;
+}
 .page-subtitle{
+    color:var(--text-muted);
+    font-size:14px;
+    margin-bottom:20px;
+}
+
+.stat-row{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:12px;
+}
+.stat{
+    border:1px solid var(--border);
+    background:var(--surface-2);
+    border-radius:var(--radius-md);
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.stat-icon{
+    width:34px;
+    height:34px;
+    border-radius:9px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    flex-shrink:0;
+}
+.stat-icon.open{ background:var(--danger-soft); color:var(--danger); }
+.stat-icon.inprogress{ background:var(--warning-soft); color:var(--warning); }
+.stat-icon.closed{ background:var(--success-soft); color:var(--success); }
+.stat-num{
+    font-family:'Lexend',sans-serif;
+    font-weight:600;
+    font-size:18px;
+    line-height:1.1;
+    color:var(--text);
+}
+.stat-label{
+    font-size:12px;
     color:var(--text-muted);
 }
 
-.ticket-card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:14px;
-    padding:20px;
-    margin-bottom:16px;
-    transition:all 0.2s ease;
+/* ---------- Ticket list ---------- */
+.list-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    padding:0 2px;
+}
+.list-heading span{
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-faint);
 }
 
-.ticket-card:hover{
-    transform:translateY(-2px);
-    border-color:var(--accent);
+.ticket-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-left:4px solid var(--border-strong);
+    border-radius:var(--radius-md);
+    padding:18px 20px;
+    margin-bottom:14px;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow .18s ease, transform .18s ease, border-left-color .18s ease;
 }
+.ticket-card:hover{
+    box-shadow:var(--shadow-md);
+    transform:translateY(-2px);
+}
+.ticket-card.status-open{ border-left-color:var(--danger); }
+.ticket-card.status-inprogress{ border-left-color:var(--warning); }
+.ticket-card.status-closed{ border-left-color:var(--success); }
 
 .ticket-header{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-bottom:12px;
+    margin-bottom:10px;
 }
+.ticket-id{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--text-faint);
+    letter-spacing:.02em;
+}
+
+.ticket-header-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+}
+.ticket-dates{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:2px;
+}
+.ticket-dates span{
+    font-size:11px;
+    color:var(--text-faint);
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    white-space:nowrap;
+}
+.ticket-dates i{
+    font-size:10.5px;
+    color:var(--text-faint);
+}
+.ticket-dates .resolved-at{ color:var(--success); }
+.ticket-dates .resolved-at i{ color:var(--success); }
+
+.badge-status{
+    padding:5px 12px;
+    border-radius:999px;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:.03em;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+}
+.badge-status i{ font-size:8px; }
+
+.open{ background:var(--danger-soft); color:var(--danger); }
+.inprogress{ background:var(--warning-soft); color:var(--warning); }
+.closed{ background:var(--success-soft); color:var(--success); }
 
 .ticket-title{
-    font-size:18px;
+    font-family:'Lexend',sans-serif;
+    font-size:16.5px;
     font-weight:600;
+    color:var(--text);
+    margin-bottom:6px;
 }
-
 .ticket-desc{
     color:var(--text-muted);
+    font-size:14px;
+    line-height:1.55;
     margin-bottom:16px;
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
 }
 
 .ticket-footer{
     display:flex;
-    justify-content:space-between;
+    justify-content:flex-end;
     align-items:center;
+    padding-top:12px;
+    border-top:1px solid var(--border);
 }
 
-.badge-status{
-    padding:6px 12px;
-    border-radius:999px;
-    font-size:12px;
+.btn-resolution{
+    background:var(--accent-soft);
+    color:var(--accent);
+    border:1px solid transparent;
+    font-size:13.5px;
     font-weight:600;
+    padding:8px 16px;
+    border-radius:var(--radius-sm);
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:background .15s ease, border-color .15s ease;
+}
+.btn-resolution:hover{
+    background:#fff;
+    border-color:var(--accent);
+    color:var(--accent);
 }
 
-.open{
-    background:#dc262620;
-    color:#ef4444;
+.pending-note{
+    font-size:13px;
+    color:var(--text-faint);
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
 }
 
-.inprogress{
-    background:#f59e0b20;
-    color:#f59e0b;
+/* ---------- Modal ---------- */
+.modal-content{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 24px 60px -12px rgba(16,24,40,.35);
+}
+.modal-header{
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+    padding:20px 24px;
+}
+.modal-eyebrow{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    font-family:'IBM Plex Mono', monospace;
+    margin-bottom:2px;
+}
+.modal-title-custom{
+    font-family:'Lexend',sans-serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--text);
+}
+.modal-body{ padding:24px; }
+
+.res-icon{
+    width:40px;
+    height:40px;
+    border-radius:10px;
+    background:var(--accent-soft);
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:17px;
+    flex-shrink:0;
+}
+.res-heading{
+    font-family:'Lexend',sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--text);
+}
+.res-sub{
+    font-size:12.5px;
+    color:var(--text-faint);
 }
 
-.closed{
-    background:#16a34a20;
-    color:#22c55e;
+.res-box{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-left:3px solid var(--accent);
+    border-radius:var(--radius-sm);
+    padding:16px 18px;
+    margin-top:16px;
+    font-size:14.5px;
+    line-height:1.65;
+    color:var(--text);
 }
 
-.ticket-id{
-    font-family:monospace;
+.res-confirm-note{
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:var(--warning-soft);
+    border:1px solid #FBE3B5;
+    color:var(--warning);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    font-size:13px;
+    margin-top:16px;
+}
+
+.modal-footer{
+    border-top:1px solid var(--border);
+    padding:16px 24px;
+    background:var(--surface-2);
+}
+.btn-accept{
+    background:var(--success);
+    border:none;
+    color:#fff;
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 18px;
+    border-radius:var(--radius-sm);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
+.btn-accept:hover{ background:#0B6339; color:#fff; }
+.btn-dismiss{
+    background:transparent;
+    border:1px solid var(--border-strong);
     color:var(--text-muted);
+    font-weight:600;
+    font-size:13.5px;
+    padding:9px 16px;
+    border-radius:var(--radius-sm);
+}
+.btn-dismiss:hover{ background:var(--surface); color:var(--text); }
+
+/* ---------- Empty state ---------- */
+.empty-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    text-align:center;
+    padding:64px 28px;
+}
+.empty-icon{
+    width:56px;
+    height:56px;
+    border-radius:14px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text-faint);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    margin:0 auto 18px auto;
+}
+.empty-card h4{
+    font-family:'Lexend',sans-serif;
+    font-weight:600;
+    font-size:17px;
+    color:var(--text);
+    margin-bottom:6px;
+}
+.empty-card p{
+    color:var(--text-muted);
+    font-size:14px;
+    margin-bottom:20px;
+}
+.empty-card .btn-primary{
+    background:var(--primary);
+    border:none;
+    font-weight:600;
+    padding:10px 20px;
+    border-radius:var(--radius-sm);
+}
+
+@media (max-width:576px){
+    .stat-row{ grid-template-columns:1fr; }
+    .shell{ padding:0 16px; }
+    .topbar-inner{ padding:0 16px; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-    <div class="page-header">
-        <div>
-            <div class="page-title">My Tickets</div>
-            <div class="page-subtitle">
-                View and track all incidents raised by you
+<div class="topbar">
+    <div class="topbar-inner">
+        <div class="brand">
+            <div class="brand-mark">SD</div>
+            <div>
+                <div class="brand-name">HCL ServiceDesk</div>
+                <div class="brand-sub">IT Support &amp; Incident Management</div>
             </div>
         </div>
-
-        <a href="/raise_ticket" class="btn btn-primary">
-            + Raise Ticket
+        <a href="/raise_ticket" class="btn-raise">
+            <i class="bi bi-plus-lg"></i> Raise Ticket
         </a>
+    </div>
+</div>
+
+<div class="shell">
+
+    <div class="page-card">
+        <div class="page-title">My Tickets</div>
+        <div class="page-subtitle">View and track all incidents you've raised, and review resolutions from the support team.</div>
+
+        {% if tickets %}
+        <div class="stat-row">
+            <div class="stat">
+                <div class="stat-icon open"><i class="bi bi-exclamation-circle-fill"></i></div>
+                <div>
+                    <div class="stat-num">{{ tickets|selectattr('Status','equalto','OPEN')|list|length }}</div>
+                    <div class="stat-label">Open</div>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="stat-icon inprogress"><i class="bi bi-hourglass-split"></i></div>
+                <div>
+                    <div class="stat-num">{{ tickets|selectattr('Status','equalto','IN_PROGRESS')|list|length }}</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+            </div>
+            <div class="stat">
+                <div class="stat-icon closed"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                    <div class="stat-num">{{ tickets|rejectattr('Status','equalto','OPEN')|rejectattr('Status','equalto','IN_PROGRESS')|list|length }}</div>
+                    <div class="stat-label">Closed</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     {% if tickets %}
 
+        <div class="list-heading">
+            <span>All Incidents</span>
+        </div>
+
         {% for ticket in tickets %}
 
-        <div class="ticket-card">
+        {% set status_class = 'open' if ticket.Status == 'OPEN' else ('inprogress' if ticket.Status == 'IN_PROGRESS' else 'closed') %}
+
+        <div class="ticket-card status-{{ status_class }}">
 
             <div class="ticket-header">
+                <span class="ticket-id">INC-{{ ticket.TicketNumber }}</span>
 
-                <div class="ticket-title">
-                    {{ ticket.shortDesc }}
+                <div class="ticket-header-right">
+                    {% if ticket.Status == 'OPEN' %}
+                        <span class="badge-status open"><i class="bi bi-circle-fill"></i>OPEN</span>
+                    {% elif ticket.Status == 'IN_PROGRESS' %}
+                        <span class="badge-status inprogress"><i class="bi bi-circle-fill"></i>IN PROGRESS</span>
+                    {% else %}
+                        <span class="badge-status closed"><i class="bi bi-circle-fill"></i>CLOSED</span>
+                    {% endif %}
+
+                    {% if ticket.CreatedAt or ticket.ResolvedAt %}
+                    <div class="ticket-dates">
+                        {% if ticket.CreatedAt %}
+                        <span class="opened-at"><i class="bi bi-calendar-plus"></i>Opened {{ (ticket.CreatedAt|string)[:19] }}</span>
+                        {% endif %}
+                        {% if ticket.ResolvedAt %}
+                        <span class="resolved-at"><i class="bi bi-calendar-check"></i>Resolved {{ (ticket.ResolvedAt|string)[:19] }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 </div>
-
             </div>
 
-            <div class="ticket-desc">
-                {{ ticket.longDesc }}
-            </div>           
-            
-        
+            <div class="ticket-title">{{ ticket.shortDesc }}</div>
+            <div class="ticket-desc">{{ ticket.longDesc }}</div>
+
+            <div class="ticket-footer">
+                {% if ticket.Resolution %}
+                    <button type="button" class="btn-resolution" data-bs-toggle="modal" data-bs-target="#resolutionModal-{{ ticket.TicketNumber }}">
+                        <i class="bi bi-file-text"></i> View Resolution
+                    </button>
+                {% elif ticket.Status == 'OPEN' or ticket.Status == 'IN_PROGRESS' %}
+                    <span class="pending-note"><i class="bi bi-clock"></i> Awaiting update from support</span>
+                {% endif %}
+            </div>
+
+        </div>
 
         {% if ticket.Resolution %}
-            <div class="resolution-actions" style="margin-top: 15px; display: flex; justify-content: flex-end; width: 100%;">
-            <button type="button" onclick="toggleResolution('{{ticket.TicketNumber}}')" style="background-color: #00bcd4; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                View Resolution
-            </button>
-            </div>           
+        <div class="modal fade" id="resolutionModal-{{ ticket.TicketNumber }}" tabindex="-1" aria-labelledby="resolutionModalLabel-{{ ticket.TicketNumber }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div>
+                            <div class="modal-eyebrow">INC-{{ ticket.TicketNumber }}</div>
+                            <div class="modal-title-custom" id="resolutionModalLabel-{{ ticket.TicketNumber }}">{{ ticket.shortDesc }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="res-icon"><i class="bi bi-check2-circle"></i></div>
+                            <div>
+                                <div class="res-heading">Resolution provided</div>
+                                <div class="res-sub">Shared by the support team</div>
+                            </div>
+                        </div>
 
-            <div id="resolutionBox-{{ticket.TicketNumber}}" style="display: none; margin-top: 15px; padding: 15px; background-color: #ffffff; color: #333333; border-radius: 4px; border-left: 5px solid #00bcd4; width: 100%; box-sizing: border-box;">
-                <strong style="color: #00bcd4; display: block; margin-bottom: 5px;">Resolution:</strong>
-                <span style="color: #111111; word-wrap: break-word;">{{ ticket.Resolution }}</span>
-                {% if ticket.Status=="OPEN" %}
-                <button type="button" onclick="acceptResolution('{{ticket.TicketNumber}}')" style="background-color: chartreuse; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Accept Resolution</button>
-                {% endif %}
+                        <div class="res-box">{{ ticket.Resolution }}</div>
 
+                        {% if ticket.Status == 'OPEN' %}
+                        <div class="res-confirm-note">
+                            <i class="bi bi-info-circle-fill"></i>
+                            <span>If this resolves your issue, confirm below to close the ticket. If not, please reply to the ticket for further assistance.</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-dismiss" data-bs-dismiss="modal">Close</button>
+                        {% if ticket.Status == 'OPEN' %}
+                        <button type="button" class="btn-accept" onclick="acceptResolution('{{ ticket.TicketNumber }}')">
+                            <i class="bi bi-check-lg"></i> Accept &amp; Close Ticket
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-
-            <script>
-            function acceptResolution(ticketId){
-                // now I want that once the user accepts the resolution, the status must be set to CLOSED and the 
-                //Basically in a java script function we cannot change a server side variable 
-                // the right way to go about it is to send a call to the flask API end point
-                fetch(`/close_ticket/${ticketId}`,{method:'POST',headers:{'Content-Type':'application/json'}})
-                .then(()=>{
-                    window.location.reload();
-                });
-            }
-            function toggleResolution(ticketId) {
-                var box = document.getElementById("resolutionBox-"+ticketId);
-                if (box.style.display === "none" || box.style.display === "") {
-                    box.style.display = "block";
-                } else {
-                    box.style.display = "none";
-                }
-            }
-            </script>
+        </div>
         {% endif %}
-
-        <div class="ticket-footer">
-            {% if ticket.Status == 'OPEN' %}
-                <span class="badge-status open">OPEN</span>
-
-            {% elif ticket.Status == 'IN_PROGRESS' %}
-                <span class="badge-status inprogress">
-                    IN PROGRESS
-                </span>
-
-            {% else %}
-                <span class="badge-status closed">
-                    CLOSED
-                </span>
-            {% endif %}                
-
-        </div>
-
-        </div>
 
         {% endfor %}
 
     {% else %}
 
-        <div class="card bg-dark border-secondary text-center p-5">
-
-            <h4>No Tickets Found</h4>
-
-            <p class="text-secondary">
-                You haven't raised any incidents yet.
-            </p>
-
-            <a href="/raise_ticket" class="btn btn-primary">
-                Create First Ticket
-            </a>
-
+        <div class="empty-card">
+            <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+            <h4>No tickets yet</h4>
+            <p>You haven't raised any incidents. When you do, you'll be able to track their status and resolutions here.</p>
+            <a href="/raise_ticket" class="btn btn-primary">Create First Ticket</a>
         </div>
 
     {% endif %}
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function acceptResolution(ticketId){
+    // Server-side status can't be changed from JS directly, so we notify
+    // the Flask backend and then refresh to reflect the new state.
+    fetch(`/close_ticket/${ticketId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    }).then(() => {
+        window.location.reload();
+    });
+}
+</script>
 
 </body>
 </html>
