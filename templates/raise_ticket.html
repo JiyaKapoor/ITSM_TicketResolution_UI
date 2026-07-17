@@ -7,168 +7,181 @@
 
 <style>
 :root{
-    --bg:#0f172a;
-    --card:#111827;
-    --input:#1e293b;
-    --border:#334155;
-    --text:#f8fafc;
-    --muted:#94a3b8;
-    --accent:#3b82f6;
-    --accent-hover:#2563eb;
-    --red:#ef4444;
-    --yellow:#f59e0b;
-    --green:#22c55e;
+    --bg:#0b1220;
+    --card:#111a2b;
+    --surface:#162236;
+    --input:#0f1727;
+    --border:#243247;
+    --text:#f4f8ff;
+    --muted:#9db0ca;
+    --accent:#3f8cff;
+    --accent-hover:#2a6ed8;
+    --accent-soft:rgba(63, 140, 255, 0.18);
+    --shadow:0 24px 60px rgba(0, 0, 0, 0.35);
 }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+*{ margin:0; padding:0; box-sizing:border-box; }
 
 body{
-    background:var(--bg);
+    background:radial-gradient(circle at top left, #15243b 0%, #0b1220 55%, #070c16 100%);
     color:var(--text);
-    font-family:Inter,Segoe UI,sans-serif;
+    font-family:Segoe UI, Arial, sans-serif;
     min-height:100vh;
-    padding:40px 20px;
+    padding:32px 18px;
 }
 
 .container{
-    max-width:900px;
-    margin:auto;
+    max-width:980px;
+    margin:0 auto;
+}
+
+.brand-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:18px;
+    padding:14px 18px;
+    background:rgba(17, 26, 43, 0.92);
+    border:1px solid rgba(63, 140, 255, 0.22);
+    border-radius:14px;
+    box-shadow:0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.brand-logo{
+    font-size:1.1rem;
+    font-weight:800;
+    letter-spacing:0.04em;
+    color:#7fb0ff;
+}
+
+.brand-subtitle{
+    color:var(--muted);
+    font-size:0.92rem;
 }
 
 .card{
     background:var(--card);
     border:1px solid var(--border);
-    border-radius:16px;
-    padding:32px;
+    border-radius:20px;
+    padding:30px;
+    box-shadow:var(--shadow);
+}
+
+.hero-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:24px;
 }
 
 h1{
-    font-size:36px;
-    margin-bottom:8px;
+    font-size:2rem;
+    margin-bottom:6px;
+    color:#f8fbff;
 }
 
 .subtitle{
     color:var(--muted);
-    margin-bottom:32px;
+    font-size:0.98rem;
+}
+
+.badge{
+    background:var(--accent-soft);
+    color:#8dc0ff;
+    border-radius:999px;
+    padding:10px 14px;
+    font-weight:700;
+    font-size:0.88rem;
+    white-space:nowrap;
 }
 
 .section{
-    margin-bottom:28px;
+    margin-bottom:24px;
 }
 
-label{
+.section label{
     display:block;
-    margin-bottom:8px;
-    font-size:13px;
+    margin-bottom:10px;
+    font-size:0.8rem;
     text-transform:uppercase;
-    letter-spacing:.08em;
-    color:var(--muted);
-}
-.choice-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 10px;
+    letter-spacing:0.09em;
+    font-weight:700;
+    color:#a8bdd9;
 }
 
-.choice {
-    padding: 12px 18px;
-    border: 1px solid #334155;
-    border-radius: 10px;
-    background: #1e293b;
-    color: #cbd5e1;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 14px;
-    font-weight: 500;
+.field-wrap{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px;
 }
 
-.choice:hover {
-    border-color: #3b82f6;
-    transform: translateY(-2px);
-}
-
-.choice.selected {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: white;
-}
-
-.p1.selected {
-    background: #dc2626;
-    border-color: #dc2626;
-}
-
-.p2.selected {
-    background: #d97706;
-    border-color: #d97706;
-}
-
-.p3.selected {
-    background: #2563eb;
-    border-color: #2563eb;
-}
-
-input,textarea{
+input[type="text"], select{
     width:100%;
     background:var(--input);
     border:1px solid var(--border);
     color:var(--text);
     border-radius:10px;
-    padding:12px;
-    font-size:14px;
+    padding:14px 14px;
+    font-size:0.98rem;
+    outline:none;
+    transition:border-color .2s ease, box-shadow .2s ease;
 }
 
-textarea{
-    min-height:140px;
-    resize:vertical;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-    gap:12px;
-}
-
-.choice{
-    border:1px solid var(--border);
-    background:var(--input);
-    border-radius:10px;
-    padding:14px;
-    cursor:pointer;
-    text-align:center;
-}
-
-.choice.selected{
+input[type="text"]:focus, select:focus{
     border-color:var(--accent);
-    background:rgba(59,130,246,.15);
+    box-shadow:0 0 0 4px rgba(63, 140, 255, 0.18);
 }
 
-.priority{
+select{
+    appearance:none;
+    background-image:linear-gradient(45deg, transparent 50%, #9db0ca 50%), linear-gradient(135deg, #9db0ca 50%, transparent 50%);
+    background-position:calc(100% - 20px) calc(1.15em + 1px), calc(100% - 14px) calc(1.15em + 1px);
+    background-size:6px 6px, 6px 6px;
+    background-repeat:no-repeat;
+    cursor:pointer;
+}
+
+.actions{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
+    grid-template-columns:1fr 1fr;
     gap:12px;
+    margin-top:8px;
 }
 
 .submit{
-    margin-top:24px;
-    width:100%;
     border:none;
     background:var(--accent);
     color:white;
-    border-radius:10px;
-    padding:14px;
-    font-size:15px;
-    font-weight:600;
+    border-radius:12px;
+    padding:14px 18px;
+    font-size:0.96rem;
+    font-weight:700;
     cursor:pointer;
+    transition:all .2s ease;
 }
 
 .submit:hover{
     background:var(--accent-hover);
+    transform:translateY(-1px);
+}
+
+.submit.secondary{
+    background:#152236;
+    border:1px solid var(--border);
+    color:#f4f8ff;
+}
+
+.submit.secondary:hover{
+    background:#1a2a41;
+}
+
+@media (max-width: 700px){
+    .hero-row{ flex-direction:column; }
+    .actions{ grid-template-columns:1fr; }
+    .card{ padding:20px; }
 }
 </style>
 </head>
@@ -176,98 +189,84 @@ textarea{
 <body>
 
 <div class="container">
-
-    <h1>Raise a Ticket</h1>    
+    <div class="brand-bar">
+        <div class="brand-logo">HCLTech</div>
+        <div class="brand-subtitle">IT Service Management</div>
+    </div>
 
     <form action="/raise_ticket" method="POST">
         <div class="card">
+            <div class="hero-row">
+                <div>
+                    <h1>Raise a Ticket</h1>
+                    <div class="subtitle">Submit a service request with clear details to help our support team resolve it quickly.</div>
+                </div>
+                <div class="badge">Support Portal</div>
+            </div>
+
+            <div class="section">
+                <label>Issue Type *</label>
+                <div class="field-wrap">
+                    <select name="issueType" id="issueType">
+                        <option value="">Select issue type</option>
+                        <option value="Hardware">Hardware</option>
+                        <option value="Software">Software</option>
+                        <option value="Network">Network</option>
+                        <option value="Email">Email</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="section">
                 <label>Short Description *</label>
-                <input type="text" name="shortDesc" id="shortDesc">
+                <div class="field-wrap">
+                    <input type="text" name="shortDesc" id="shortDesc" placeholder="Briefly describe the issue">
+                </div>
             </div>
+
             <div class="section">
-                <label>Detailed Description</label>    
-                <input type="text" name="longDesc">            
+                <label>Detailed Description</label>
+                <div class="field-wrap">
+                    <input type="text" name="longDesc" placeholder="Add relevant context, impact, and steps taken">
+                </div>
             </div>
+
             <div class="section">
-    <label>Issue Type *</label>
+                <label>Priority</label>
+                <div class="field-wrap">
+                    <select name="priority" id="priority">
+                        <option value="">Select priority</option>
+                        <option value="P1">P1</option>
+                        <option value="P2">P2</option>
+                        <option value="P3">P3</option>
+                    </select>
+                </div>
+            </div>
 
-    <input type="hidden" name="issueType" id="issueType">
-
-    <div class="choice-container">
-        <div class="choice" onclick="selectOption(this,'Hardware','issueType')">
-            💻 Hardware
+            <div class="actions">
+                <button class="submit secondary" type="button" onclick="suggestedResolution(event)">View Suggested Resolutions</button>
+                <button class="submit" type="submit">Submit Ticket</button>
+            </div>
         </div>
-
-        <div class="choice" onclick="selectOption(this,'Software','issueType')">
-            ⚙️ Software
-        </div>
-
-        <div class="choice" onclick="selectOption(this,'Network','issueType')">
-            🌐 Network
-        </div>
-
-        <div class="choice" onclick="selectOption(this,'Email','issueType')">
-            📧 Email
-        </div>
-
-        <div class="choice" onclick="selectOption(this,'Other','issueType')">
-            📋 Other
-        </div>
-    </div>
-</div>
-
-<div class="section">
-    <label>Priority</label>
-
-    <input type="hidden" name="priority" id="priority">
-
-    <div class="choice-container">
-        <div class="choice priority p1"
-             onclick="selectOption(this,'P1','priority')">
-            🔴 P1
-        </div>
-
-        <div class="choice priority p2"
-             onclick="selectOption(this,'P2','priority')">
-            🟡 P2
-        </div>
-
-        <div class="choice priority p3"
-             onclick="selectOption(this,'P3','priority')">
-            🔵 P3
-        </div>
-    </div>
-</div>  
-            <button class="submit" type="button" onclick="suggestedResolution(event)"> View Suggested Resolutions</button>
-            <button class="submit" type="submit">
-                Submit Ticket
-            </button>
-
-        </div>
-
     </form>
-
 </div>
 
 <script>
 function suggestedResolution(event){
     const text=shortDesc.value;
-    //now we send the short description of this ticket to our flask API which then returns some suggestions
     fetch('/suggest_resolutions',{
         method:'POST',
         headers:{
             'Content-Type':'application/json'
         },
-        body:JSON.stringify({description:text}) //this sends our short description to the API
+        body:JSON.stringify({description:text})
     })
     .then(response => response.json())
     .then(data => {
-        // 4. Handle and display the data returned fromFlask API
         if (data.length === 0) {
             alert("No matching resolutions found in history. Your ticket looks unique!");
         } else {
-            // Build a human-readable list of recommendations for the pop-up alert
             let message = "Found Relevant Historical Solutions:\n\n";
             data.forEach((ticket, index) => {
                 message += `${index + 1}. Ticket: ${ticket.shortDesc}\n`;
@@ -281,29 +280,6 @@ function suggestedResolution(event){
         alert("Could not retrieve suggestions at this time.");
     });
 }
-
-function selectOption(element, value, fieldId) {
-
-    document.getElementById(fieldId).value = value;
-
-    element.parentElement
-        .querySelectorAll('.choice')
-        .forEach(c => c.classList.remove('selected'));
-
-    element.classList.add('selected');
-}
-document.querySelectorAll('.choice').forEach(card=>{
-    card.addEventListener('click',()=>{
-        const parent=card.parentElement;
-
-        if(parent.classList.contains('grid') || parent.classList.contains('priority')){
-            parent.querySelectorAll('.choice')
-                  .forEach(c=>c.classList.remove('selected'));
-
-            card.classList.add('selected');
-        }
-    });
-});
 </script>
 
 </body>

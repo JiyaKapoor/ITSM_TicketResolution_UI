@@ -4,7 +4,50 @@ from sqlalchemy import func,or_
 from datetime import datetime
 from datetime import date,timedelta
 from langchain_core.documents import Document
-from find_relevant_tickets import find_relevant_tickets
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
+vectorizer=TfidfVectorizer(stop_words="english",ngram_range=(1,2))
+historical_tickets = [
+    {
+        "id": "TKT-101",
+        "description": "The VPN is not connecting. I keep getting error code 691 after entering my password.",
+        "resolution": "Reset the user's VPN password in the Active Directory portal.",
+    },{
+        "id": "TKT-102",
+        "description": "My outlook keeps crashing every time I try to open a shared mailbox. Help!",
+        "resolution": "Run outlook.exe /safe to isolate the issue. Disable third-party add-ins.",
+    },
+    {
+        "id": "TKT-103",
+        "description": "Wi-Fi in the conference room is dropping packets and disconnecting.",
+        "resolution": "Reboot the Cisco access point in Corridor B.",
+    },
+]
+ticket_descriptions=[t["description"] for t in historical_tickets]
+historical_keywords=vectorizer.fit_transform(ticket_descriptions)
+
+
+def find_relevant_tickets(new_ticket_descirption,top_n=2):
+    #we basically are accepting a new ticket from the user and passing it to this function 
+    # This function uses TF IDF to a keyword frequency vector 
+    new_keyword_vector=vectorizer.transform([new_ticket_descirption])
+    #Now we compute the similarity of this vector with the already present tickets 
+    
+    key_word_score=cosine_similarity(new_keyword_vector,historical_keywords)[0]
+    print(key_word_score)
+    top_indices=np.argsort(key_word_score)[::-1][:top_n]
+    results=[]
+    for idx in top_indices:
+        score=key_word_score[idx]
+        if score>0:
+            results.append({
+                "shortDesc":historical_tickets[idx]["description"],
+                "resolution":historical_tickets[idx]["resolution"]
+            })
+    return results
+
+print(find_relevant_tickets("My outlook keeps crashing while trying to open a shared mailbox"))
 
 app=Flask(__name__)
 app.secret_key="jiya@123" # used to cryptographically sign the user session key 
@@ -81,7 +124,9 @@ def login_page():
 #creating landing page endpoint
 @app.route('/welcome_user')
 def welcome_user():
-    return render_template('welcome.html')
+    open_requests = Ticket.query.filter_by(Status="OPEN").count()
+    resolved_requests = Ticket.query.filter(Ticket.ResolvedAt.isnot(None)).count()
+    return render_template('welcome.html', open_requests=open_requests, resolved_requests=resolved_requests)
 
 @app.route('/welcome_agent')
 def welcome_agent():
@@ -201,7 +246,13 @@ def suggest_resolutions():
     return jsonify(suggestions)
 
 with app.app_context():
-    db.create_all()   
+    db.create_all()
+
+    default_user = User.query.filter_by(username="jiyakapoor1409@gmil.com").first()
+    if default_user is None:
+        db.session.add(User(username="jiyakapoor1409@gmil.com", password="jiya@123", role="USER"))
+        db.session.commit()
+
     print("USer entry added")
     
 
