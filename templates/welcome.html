@@ -1,274 +1,395 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HCLTech User Dashboard</title>
-  <style>
-    :root {
-      --bg: #091120;
-      --bg-soft: #101c31;
-      --card: #11213a;
-      --card-2: #0d1729;
-      --border: #22344f;
-      --text: #f6f9ff;
-      --muted: #96a9c5;
-      --accent: #3f8cff;
-      --accent-2: #7fd0ff;
-      --success: #33c57d;
-      --warning: #ffb347;
-      --shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCLTech User Dashboard</title>
 
-    * { box-sizing: border-box; }
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Segoe UI, Arial, sans-serif;
-      background:
-        radial-gradient(circle at top left, #15243b 0%, #0a1322 45%, #070c16 100%);
-      color: var(--text);
-    }
+<style>
+:root{
+    --bg:#EEF1F6;
+    --surface:#FFFFFF;
+    --surface-2:#F7F9FC;
+    --border:#E3E8F0;
+    --border-strong:#D3DAE6;
 
-    .shell {
-      width: 100%;
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 24px;
-    }
+    --text:#101828;
+    --text-muted:#5D6B82;
+    --text-faint:#98A2B3;
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 22px;
-      padding: 14px 18px;
-      background: rgba(16, 28, 49, 0.92);
-      border: 1px solid rgba(63, 140, 255, 0.22);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-    }
+    --primary:#12294F;
+    --primary-2:#1D3D73;
+    --accent:#0C8599;
+    --accent-soft:#E4F6F8;
 
-    .brand-box {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+    --hcl-blue:#0F5FDC;
 
-    .brand-badge {
-      background: rgba(63, 140, 255, 0.18);
-      color: #8ec3ff;
-      padding: 8px 12px;
-      border-radius: 10px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-    }
+    --danger:#D92D20;
+    --danger-soft:#FDEDEB;
+    --warning:#B54708;
+    --warning-soft:#FEF6E7;
+    --success:#0F7A47;
+    --success-soft:#E7F7EE;
 
-    .brand-text {
-      font-size: 0.95rem;
-      color: var(--muted);
-    }
+    --radius-lg:16px;
+    --radius-md:12px;
+    --radius-sm:8px;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+    --shadow-md:0 8px 24px -8px rgba(16,24,40,.14);
+}
 
-    .nav-links {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+*{ box-sizing:border-box; }
+body{
+    margin:0;
+    background:
+        radial-gradient(1100px 380px at 12% -10%, #EAF3F5 0%, transparent 60%),
+        var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:24px 24px 64px 24px;
+}
 
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text);
-      background: #0d1729;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      transition: 0.2s ease;
-    }
+.shell{ max-width:1080px; margin:0 auto; }
 
-    .nav-links a:hover {
-      background: #16304e;
-      border-color: #3f8cff;
-      transform: translateY(-1px);
-    }
+/* ---------- Logo strip ---------- */
+.logo-strip{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    padding:14px 22px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:16px;
+    flex-wrap:wrap;
+}
+.hcl-logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.hcl-wordmark{
+    font-family:'Lexend', sans-serif;
+    font-weight:700;
+    font-size:21px;
+    color:var(--hcl-blue);
+    letter-spacing:-.01em;
+}
+.hcl-divider{
+    width:1px;
+    height:22px;
+    background:var(--border-strong);
+}
+.hcl-sub{
+    font-size:12.5px;
+    color:var(--text-muted);
+    font-weight:500;
+}
 
-    .hero {
-      display: block;
-      margin-bottom: 20px;
-    }
+.nav-links{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+.nav-links a{
+    text-decoration:none;
+    color:var(--text-muted);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    padding:9px 15px;
+    border-radius:var(--radius-sm);
+    font-weight:600;
+    font-size:13.5px;
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    transition:.15s ease;
+}
+.nav-links a:hover{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+    color:var(--accent);
+}
+.nav-links a.active{
+    background:var(--primary);
+    border-color:var(--primary);
+    color:#fff;
+}
 
-    .hero-card,
-    .side-card,
-    .info-card {
-      background: linear-gradient(180deg, rgba(17, 33, 58, 0.98), rgba(10, 18, 32, 0.98));
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-    }
+/* ---------- Hero ---------- */
+.hero-card{
+    background:linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-md);
+    padding:38px 36px;
+    margin-bottom:18px;
+    position:relative;
+    overflow:hidden;
+}
+.hero-card::after{
+    content:"";
+    position:absolute;
+    top:-60px; right:-60px;
+    width:220px; height:220px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.08) 0%, transparent 70%);
+}
+.hero-eyebrow{
+    color:#9FC3FF;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+.hero-card h1{
+    margin:0 0 10px;
+    font-family:'Lexend', sans-serif;
+    font-size:1.9rem;
+    font-weight:600;
+    color:#fff;
+    line-height:1.2;
+    max-width:520px;
+}
+.hero-card p{
+    color:rgba(255,255,255,.68);
+    margin:0 0 24px;
+    font-size:14.5px;
+    line-height:1.65;
+    max-width:480px;
+}
+.cta-row{ display:flex; gap:12px; flex-wrap:wrap; }
+.cta{
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:var(--radius-sm);
+    font-weight:600;
+    font-size:14px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition:.15s ease;
+}
+.cta.primary{ color:var(--primary); background:#fff; }
+.cta.primary:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.2); }
+.cta.secondary{ color:#fff; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.28); }
+.cta.secondary:hover{ background:rgba(255,255,255,.16); }
 
-    .hero-card {
-      padding: 34px;
-      width: 100%;
-    }
+/* ---------- Stats ---------- */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
+    margin-bottom:18px;
+}
+.stat-box{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-sm);
+    padding:18px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+.stat-icon{
+    width:42px; height:42px;
+    border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+    flex-shrink:0;
+}
+.stat-icon.warning{ background:var(--warning-soft); color:var(--warning); }
+.stat-icon.success{ background:var(--success-soft); color:var(--success); }
+.stat-icon.info{ background:var(--accent-soft); color:var(--accent); }
+.stat-label{ color:var(--text-muted); font-size:12.5px; margin-bottom:3px; }
+.stat-value{ font-family:'Lexend', sans-serif; font-size:1.5rem; font-weight:600; line-height:1; color:var(--text); }
 
-    .hero-card h1 {
-      margin: 0 0 12px;
-      font-size: 2.2rem;
-      line-height: 1.15;
-    }
+/* ---------- Grid two ---------- */
+.grid-two{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:16px;
+}
+.info-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-sm);
+    padding:22px 24px;
+}
+.info-card h3{
+    margin:0 0 16px;
+    font-family:'Lexend', sans-serif;
+    font-size:15px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    color:var(--text);
+}
+.info-card h3 i{ color:var(--accent); font-size:16px; }
 
-    .hero-card p {
-      color: var(--muted);
-      margin: 0 0 22px;
-      font-size: 1rem;
-      line-height: 1.7;
-    }
+.mini-grid{ display:grid; gap:10px; }
+.mini-item{
+    padding:13px 14px;
+    border-radius:var(--radius-sm);
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-size:13px;
+    line-height:1.5;
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+}
+.mini-item i{
+    color:var(--accent);
+    font-size:15px;
+    margin-top:1px;
+}
+.mini-item strong{
+    color:var(--text);
+    display:block;
+    margin-bottom:2px;
+    font-size:13.5px;
+}
 
-    .cta-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+.mini-item.link{
+    text-decoration:none;
+    cursor:pointer;
+    transition:.15s ease;
+}
+.mini-item.link:hover{
+    background:var(--accent-soft);
+    border-color:var(--accent);
+}
 
-    .cta {
-      text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: 700;
-      transition: 0.2s ease;
-    }
-
-    .cta.primary {
-      color: white;
-      background: var(--accent);
-    }
-
-    .cta.secondary {
-      color: var(--text);
-      background: transparent;
-      border: 1px solid var(--border);
-    }
-
-    .cta:hover {
-      transform: translateY(-1px);
-      filter: brightness(1.06);
-    }
-
-    .side-card {
-      padding: 22px;
-    }
-
-    .side-card h3,
-    .info-card h3 {
-      margin: 0 0 14px;
-      font-size: 1.05rem;
-    }
-
-    .mini-grid {
-      display: grid;
-      gap: 10px;
-    }
-
-    .mini-item {
-      padding: 12px 13px;
-      border-radius: 12px;
-      background: #0d1729;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .mini-item strong {
-      color: var(--text);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .info-card {
-      padding: 20px;
-    }
-
-    .stat-box {
-      background: linear-gradient(180deg, #13233d, #0d1729);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-    }
-
-    .stat-value {
-      font-size: 1.6rem;
-      font-weight: 800;
-    }
-
-    .stat-value.success { color: var(--success); }
-    .stat-value.warning { color: var(--warning); }
-    .stat-value.info { color: var(--accent-2); }
-
-    .grid-two {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    @media (max-width: 900px) {
-      .grid-two,
-      .stats {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+@media (max-width: 900px) {
+    .grid-two, .stats { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px){
+    body{ padding:16px 14px 48px 14px; }
+    .hero-card{ padding:26px 22px; }
+}
+</style>
 </head>
 <body>
   <div class="shell">
-    <div class="topbar">
-      <div class="brand-box">
-        <div class="brand-badge">HCLTech</div>
-        <div class="brand-text">User Support Portal</div>
-      </div>
 
-      <div class="nav-links">
-        <a href="/welcome_user">Dashboard</a>
-        <a href="/raise_ticket">Raise a Ticket</a>
-        <a href="/my_tickets">My Tickets</a>
-      </div>
+    <div class="logo-strip">
+        <div class="hcl-logo">
+            <div class="hcl-wordmark">HCLTech</div>
+            <div class="hcl-divider"></div>
+            <div class="hcl-sub">IT Service Management</div>
+        </div>
+
+        <div class="nav-links">
+            <a href="/welcome_user" class="active"><i class="bi bi-grid"></i> Dashboard</a>
+            <a href="/raise_ticket"><i class="bi bi-plus-circle"></i> Raise a Ticket</a>
+            <a href="/my_tickets"><i class="bi bi-ticket-perforated"></i> My Tickets</a>
+        </div>
     </div>
 
-    <div class="hero">
-      <div class="hero-card">
-        <h1>Welcome back to ITSM service desk.</h1>
-        <p>
-          Submit requests, monitor progress, and stay aligned with your IT support workflow in one clean, enterprise-ready portal.
-        </p>
+    <div class="hero-card">
+        <div class="hero-eyebrow"><i class="bi bi-shield-check"></i> Support Portal</div>
+        <h1>Welcome back to the ITSM service desk.</h1>
+        <p>Submit requests, monitor progress, and stay aligned with your IT support workflow in one clean, enterprise-ready portal.</p>
         <div class="cta-row">
-          <a class="cta primary" href="/raise_ticket">Raise a Ticket</a>
-          <a class="cta secondary" href="/my_tickets">View My Tickets</a>
+            <a class="cta primary" href="/raise_ticket"><i class="bi bi-plus-lg"></i> Raise a Ticket</a>
+            <a class="cta secondary" href="/my_tickets"><i class="bi bi-ticket-perforated"></i> View My Tickets</a>
         </div>
-      </div>      
     </div>
 
     <div class="stats">
       <div class="stat-box">
-        <div class="stat-label">Open Requests</div>
-        <div class="stat-value warning">{{ open_requests }}</div>
+        <div class="stat-icon warning"><i class="bi bi-exclamation-circle-fill"></i></div>
+        <div>
+            <div class="stat-label">Open Requests</div>
+            <div class="stat-value">{{ open_requests }}</div>
+        </div>
       </div>
       <div class="stat-box">
-        <div class="stat-label">Resolved Requests</div>
-        <div class="stat-value success">{{ resolved_requests }}</div>
+        <div class="stat-icon success"><i class="bi bi-check-circle-fill"></i></div>
+        <div>
+            <div class="stat-label">Resolved Requests</div>
+            <div class="stat-value">{{ resolved_requests }}</div>
+        </div>
       </div>
+      <div class="stat-box">
+        <div class="stat-icon info"><i class="bi bi-stack"></i></div>
+        <div>
+            <div class="stat-label">Total Requests</div>
+            <div class="stat-value">{{ open_requests + resolved_requests }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-two">
+        <div class="info-card">
+            <h3><i class="bi bi-lightning-charge"></i> Quick Actions</h3>
+            <div class="mini-grid">
+                <a href="/raise_ticket" class="mini-item link">
+                    <i class="bi bi-plus-circle"></i>
+                    <div>
+                        <strong>Raise a new ticket</strong>
+                        Log a hardware, software, network or email issue with our support team.
+                    </div>
+                </a>
+                <a href="/my_tickets" class="mini-item link">
+                    <i class="bi bi-eye"></i>
+                    <div>
+                        <strong>Track your requests</strong>
+                        See live status and resolutions for every ticket you've raised.
+                    </div>
+                </a>
+                <div class="mini-item">
+                    <i class="bi bi-stars"></i>
+                    <div>
+                        <strong>Check suggested resolutions</strong>
+                        While raising a ticket, view solutions from similar past incidents before submitting.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-card">
+            <h3><i class="bi bi-info-circle"></i> Need Help?</h3>
+            <div class="mini-grid">
+                <div class="mini-item">
+                    <i class="bi bi-clock-history"></i>
+                    <div>
+                        <strong>Response times</strong>
+                        Critical (P1) issues are prioritized first, followed by P2 and P3 requests.
+                    </div>
+                </div>
+                <div class="mini-item">
+                    <i class="bi bi-person-check"></i>
+                    <div>
+                        <strong>Escalations</strong>
+                        Reach out to your IT administrator if a ticket needs urgent attention.
+                    </div>
+                </div>
+                <div class="mini-item">
+                    <i class="bi bi-shield-lock"></i>
+                    <div>
+                        <strong>Data &amp; privacy</strong>
+                        Ticket details are only visible to you and the assigned support team.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
   </div>
